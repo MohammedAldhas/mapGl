@@ -1,0 +1,33 @@
+#search {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 400px;
+  height: 25px;
+  padding: 5px 10px;
+  border-radius: 12px;
+  border: none;
+}
+#search:focus {
+  border: 1px rgba(0, 0, 0, 0.248) solid;
+  outline: none;
+}
+
+
+#suggest {
+    position: absolute;
+    background-color: #fff;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 400px;
+    padding: 5px 10px;
+    border-radius: 12px;
+  }
+  
+  #suggest div:hover {
+    transition: 0.3s ease-in-out;
+    background-color: rgba(56, 140, 235, 0.508);
+  }
+  

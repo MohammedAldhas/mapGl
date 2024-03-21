@@ -6,6 +6,7 @@ import ShowMap from "./components/ShowMap";
 function App() {
   const [data, setData] = useState([""]);
   const [lngLat, setLngLat] = useState(null);
+  const [classN, setclassN] = useState("invisible");
 
   const handleMapClick = (clickedLngLat) => {
     setLngLat(clickedLngLat);
@@ -14,6 +15,8 @@ function App() {
   };
   useEffect(() => {
     if (lngLat != null) {
+      hideElm();
+
       //gecoder API
       axios
         .get(
@@ -21,19 +24,28 @@ function App() {
         )
         .then((res) => {
           setData(res.data.result.items);
-          console.log(data);
+          // console.log(data);
         });
     }
   }, [lngLat]);
 
+  function hideElm() {
+    setclassN("visible");
+  }
+
   return (
     <>
       <ShowMap onMapClick={handleMapClick} />
-      <div className="box-border p-3 shadow m-2 border-2 border-solid border-[#00000037] rounded-xl">
+      <div
+        className={`${classN} box-border p-3 shadow m-2 border-2 border-solid border-[#00000037] rounded-xl w-fit`}
+      >
         <p>Address: {data[0].address_name || data[0].full_name}</p>
         <p>Name: {data[0].name || data[0].full_name}</p>
         <p>Building: {data[0].building_name || "Unknown"}</p>
-        <p>lang: {data[0].point ? data[0].point.lat : ""}  lon: {data[0].point ? data[0].point.lon : ""}</p>
+        <p>
+          lang: {data[0].point ? data[0].point.lat : ""} lon:{" "}
+          {data[0].point ? data[0].point.lon : ""}
+        </p>
       </div>
       {/* {data.length > 0
           ? data.map((e) => {
