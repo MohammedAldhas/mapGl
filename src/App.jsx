@@ -47,13 +47,6 @@ function App() {
           {data[0].point ? data[0].point.lon : ""}
         </p>
       </div>
-      {/* {data.length > 0
-          ? data.map((e) => {
-              <p className="text-xs" key={e.id}>
-                Name:{e.full_name}
-              </p>;
-            })
-          : console.log("hhhhh")} */}
     </>
   );
 }

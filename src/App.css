@@ -24,6 +24,7 @@
     width: 400px;
     padding: 5px 10px;
     border-radius: 12px;
+    /* display: none; */
   }
   
   #suggest div:hover {

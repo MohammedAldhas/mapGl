@@ -32,13 +32,16 @@ function ShowMap({ onMapClick }) {
   }, []);
 
   useEffect(() => {
+    if (searchInput == "") {
+      return;
+    }
     axios
       .get(
         `https://catalog.api.2gis.com/3.0/suggests?q=${searchInput}&location=46.711670,24.640437&key=${apiKey}&locale=en_SA`
       )
       .then((res) => {
-        setData(res);
-        console.log(data.data);
+        setData(res.data.result.items);
+        console.log(data);
       });
   }, [searchInput]);
 
@@ -53,10 +56,16 @@ function ShowMap({ onMapClick }) {
         onChange={(e) => {
           console.log(e.target.value);
           setsearchInput(e.target.value);
-          // console.log(this);
         }}
       />
-      <div id="suggest"></div>
+      <div id="suggest">
+        {data.length > 0
+          ? data.map((res, i) => {
+              return <p key={i}>{res.name}</p>;
+            })
+          : ""}
+      </div>
+      
     </div>
   );
 }
