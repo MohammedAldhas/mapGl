@@ -18,12 +18,13 @@
 #suggest {
     position: absolute;
     background-color: #fff;
-    top: 40px;
+    top: 30px;
     left: 50%;
     transform: translateX(-50%);
     width: 400px;
     padding: 5px 10px;
     border-radius: 12px;
+
     /* display: none; */
   }
   

@@ -9,7 +9,9 @@ import axios from "axios";
 function ShowMap({ onMapClick }) {
   const [, setLngLat] = useState(null);
   const [data, setData] = useState([]);
+  const [classN, setclassN] = useState("invisible");
   const [searchInput, setsearchInput] = useState("");
+  const [places, setPlaces] = useState([]);
 
   useEffect(() => {
     let map;
@@ -46,27 +48,55 @@ function ShowMap({ onMapClick }) {
   }, [searchInput]);
 
   return (
-    <div className="w-full h-[70vh]">
-      <MapWrapper />
-      <div className="flex flex-row w-[400px] gap-1 box-border"></div>
-      <input
-        type="text"
-        id="search"
-        className="m-1 p-2"
-        onChange={(e) => {
-          console.log(e.target.value);
-          setsearchInput(e.target.value);
-        }}
-      />
-      <div id="suggest">
-        {data.length > 0
-          ? data.map((res, i) => {
-              return <p key={i}>{res.name}</p>;
-            })
-          : ""}
+    <>
+      <div className="w-full h-[70vh]">
+        <MapWrapper />
+        <div className="flex flex-row w-[400px] gap-1 box-border"></div>
+        <input
+          type="text"
+          id="search"
+          className="m-1 p-2"
+          onChange={(e) => {
+            // console.log(e.target.value);
+            if (e.target.value != "") {
+              setclassN("visible");
+              setsearchInput(e.target.value);
+            } else {
+              setclassN("invisible");
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              setPlaces(data);
+            }
+            // setsearchInput(e.target.value);
+          }}
+        />
+
+        <div id="suggest" className={`${classN}`}>
+          {data.length > 0
+            ? data.map((res, i) => {
+                return <p key={i}>{res.name}</p>;
+              })
+            : ""}
+        </div>
       </div>
-      
-    </div>
+      {/* <div className="box-border p-3 shadow m-2 border-2 border-solid border-[#00000037] rounded-xl w-full"> */}
+      {places.map((el, i) => {
+        // return <p key={i} >{JSON.stringify(places) }</p>
+        return (
+          <ul
+            key={i}
+            className="box-border p-3 shadow m-2 border-2 border-solid border-[#00000037] rounded-xl w-full"
+          >
+            <li>Name: {el.name}</li>
+            <li>Location: {el.address_name}</li>
+            <li>Type: {el.type}</li>
+          </ul>
+        );
+      })}
+      {/* </div> */}
+    </>
   );
 }
 
