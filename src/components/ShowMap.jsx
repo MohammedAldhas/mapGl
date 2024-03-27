@@ -4,14 +4,16 @@ import { useEffect, useState } from "react";
 import MapWrapper from "./MapWrapper";
 import { apiKey } from "../../public/info";
 import axios from "axios";
+
 // import { useMap } from "../context/MapContext";
 
 function ShowMap({ onMapClick }) {
-  const [, setLngLat] = useState(null);
   const [data, setData] = useState([]);
+  const [datamarker, setdatamarker] = useState([]);
   const [classN, setclassN] = useState("invisible");
   const [searchInput, setsearchInput] = useState("");
   const [places, setPlaces] = useState([]);
+  const [cent, setcent] = useState([46.714382, 24.644584]);
 
   useEffect(() => {
     let map;
@@ -21,17 +23,39 @@ function ShowMap({ onMapClick }) {
         zoom: 12,
         key: apiKey,
       });
+      if (localStorage.getItem("lon") && localStorage.getItem("lat")) {
+        map.setCenter(cent, {
+          animate: true,
+          duration: 900,
+          easing: "linear",
+        });
 
+        setTimeout(() => {
+          map.setZoom(17, {
+            animate: true,
+            duration: 5000,
+            easing: "linear",
+          });
+        }, 800);
+
+        new mapglAPI.Marker(map, {
+          coordinates: [
+            localStorage.getItem("lon"),
+            localStorage.getItem("lat"),
+          ],
+        });
+        // setzom(19);
+      }
+      localStorage.clear();
       // click handel
       map.on("click", (e) => {
         const clickedLngLat = e.lngLat;
-        setLngLat(clickedLngLat);
         onMapClick(clickedLngLat);
       });
     });
 
     return () => map && map.destroy();
-  }, []);
+  }, [cent]);
 
   useEffect(() => {
     if (searchInput == "") {
@@ -43,8 +67,17 @@ function ShowMap({ onMapClick }) {
       )
       .then((res) => {
         setData(res.data.result.items);
-        console.log(data);
-      });
+        // console.log(data);
+      })
+      .then(
+        axios
+          .get(
+            `https://catalog.api.2gis.com/3.0/markers?q=${searchInput}&location=46.711670,24.640437&key=${apiKey}&locale=en_SA`
+          )
+          .then((res) => {
+            setdatamarker(res.data.result.items[0]);
+          })
+      );
   }, [searchInput]);
 
   return (
@@ -72,18 +105,32 @@ function ShowMap({ onMapClick }) {
             // setsearchInput(e.target.value);
           }}
         />
-
         <div id="suggest" className={`${classN}`}>
-          {data.length > 0
-            ? data.map((res, i) => {
-                return <p key={i}>{res.name}</p>;
-              })
-            : ""}
+          {data.length > 0 ? (
+            data.map((res) => {
+              return (
+                <p
+                  className="cursor-pointer hover:bg-slate-400"
+                  key={res.id}
+                  onClick={() => {
+                    setcent([datamarker.lon, datamarker.lat]);
+                    localStorage.setItem("lon", datamarker.lon);
+                    localStorage.setItem("lat", datamarker.lat);
+                    setclassN("invisible");
+                  }}
+                  title={res.address_name}
+                >
+                  {res.name}
+                </p>
+              );
+            })
+          ) : (
+            <p>No suggestions available.</p>
+          )}
         </div>
       </div>
-      {/* <div className="box-border p-3 shadow m-2 border-2 border-solid border-[#00000037] rounded-xl w-full"> */}
+
       {places.map((el, i) => {
-        // return <p key={i} >{JSON.stringify(places) }</p>
         return (
           <ul
             key={i}
@@ -95,7 +142,6 @@ function ShowMap({ onMapClick }) {
           </ul>
         );
       })}
-      {/* </div> */}
     </>
   );
 }

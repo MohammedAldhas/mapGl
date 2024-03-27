@@ -1,16 +1,16 @@
 // import React, { useState } from 'react';
-import ShowMap from "./ShowMap";
+// import ShowMap from "./ShowMap";
 
-function ParentComponent() {
-  const handleMapClick = (clickedLngLat) => {
-    console.log("Clicked on map:", clickedLngLat);
-  };
+// function ParentComponent() {
+//   const handleMapClick = (clickedLngLat) => {
+//     console.log("Clicked on map:", clickedLngLat);
+//   };
 
-  return (
-    <div>
-      <ShowMap onMapClick={handleMapClick} />
-    </div>
-  );
-}
+//   return (
+//     <div>
+//       <ShowMap onMapClick={handleMapClick} />
+//     </div>
+//   );
+// }
 
-export default ParentComponent;
+// export default ParentComponent;
