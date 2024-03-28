@@ -38,7 +38,7 @@ function App() {
       <ShowMap onMapClick={handleMapClick} />
       {/* <div className=""> */}
       <div
-        className={`${classN} box-border p-3 shadow m-2 border-2 border-solid border-[#00000037] rounded-xl w-[240px] text-sm absolute top-0 left-0 bg-[#f5deb3c4]`}
+        className={`${classN} box-border p-3 shadow m-2 border-2 border-solid border-[#00000037] rounded-xl w-[280px] text-sm absolute top-0 right-0 bg-[#f5deb3c4]`}
       >
         <p>Address: {data[0].address_name || data[0].full_name}</p>
         <p>Name: {data[0].name || data[0].full_name}</p>

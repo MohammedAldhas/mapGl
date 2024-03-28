@@ -11,6 +11,7 @@ function ShowMap({ onMapClick }) {
   const [data, setData] = useState([]);
   const [datamarker, setdatamarker] = useState([]);
   const [classN, setclassN] = useState("invisible");
+  const [classpopup, setclasspopup] = useState("-left-[80%]");
   const [searchInput, setsearchInput] = useState("");
   const [places, setPlaces] = useState([]);
   const [cent, setcent] = useState([46.714382, 24.644584]);
@@ -22,6 +23,8 @@ function ShowMap({ onMapClick }) {
         center: [46.714382, 24.644584],
         zoom: 12,
         key: apiKey,
+        zoomControl: "bottomRight",
+        floorControl: "bottomLeft",
       });
       if (localStorage.getItem("lon") && localStorage.getItem("lat")) {
         map.setCenter(cent, {
@@ -51,6 +54,7 @@ function ShowMap({ onMapClick }) {
       map.on("click", (e) => {
         const clickedLngLat = e.lngLat;
         onMapClick(clickedLngLat);
+        setclasspopup("-left-[80%]");
       });
     });
 
@@ -82,7 +86,7 @@ function ShowMap({ onMapClick }) {
 
   return (
     <>
-      <div className="w-full h-[70vh]">
+      <div className="w-full h-[100vh]">
         <MapWrapper />
         <div className="flex flex-row w-[400px] gap-1 box-border"></div>
         <input
@@ -101,6 +105,7 @@ function ShowMap({ onMapClick }) {
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               setPlaces(data);
+              setclasspopup("left-0");
             }
             // setsearchInput(e.target.value);
           }}
@@ -110,7 +115,7 @@ function ShowMap({ onMapClick }) {
             data.map((res) => {
               return (
                 <p
-                  className="cursor-pointer hover:bg-slate-400"
+                  className="box-border cursor-pointer hover:bg-slate-400 px-[5px] w-full"
                   key={res.id}
                   onClick={() => {
                     setcent([datamarker.lon, datamarker.lat]);
@@ -129,19 +134,31 @@ function ShowMap({ onMapClick }) {
           )}
         </div>
       </div>
-
-      {places.map((el, i) => {
-        return (
-          <ul
-            key={i}
-            className="box-border p-3 shadow m-2 border-2 border-solid border-[#00000037] rounded-xl w-full"
-          >
-            <li>Name: {el.name}</li>
-            <li>Location: {el.address_name}</li>
-            <li>Type: {el.type}</li>
-          </ul>
-        );
-      })}
+      <div
+        className={`box-border absolute top-[1px] transition-[${classpopup}] ease-in-out duration-700 ${classpopup} w-[550px] h-[99vh] overflow-auto bg-white z-50 box-border`}
+        id="scrollStyling"
+      >
+        <div
+          className="bg-red-400 w-[25px] h-[25px] rounded-full absolute top-0 right-1 cursor-pointer flex justify-center items-center text-zinc-200 hover:scale-105"
+          onClick={() => {
+            setclasspopup("-left-[80%]");
+          }}
+        >
+          <p>X</p>
+        </div>
+        {places.map((el, i) => {
+          return (
+            <ul
+              key={i}
+              className="box-border p-3 shadow m-2 border-2 border-solid border-[#00000037] rounded-xl "
+            >
+              <li>Name: {el.name}</li>
+              <li>Location: {el.address_name}</li>
+              <li>Type: {el.type}</li>
+            </ul>
+          );
+        })}
+      </div>
     </>
   );
 }
