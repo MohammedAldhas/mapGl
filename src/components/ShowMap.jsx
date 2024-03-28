@@ -9,12 +9,11 @@ import axios from "axios";
 
 function ShowMap({ onMapClick }) {
   const [data, setData] = useState([]);
-  const [datamarker, setdatamarker] = useState([]);
   const [classN, setclassN] = useState("invisible");
   const [classpopup, setclasspopup] = useState("-left-[80%]");
   const [searchInput, setsearchInput] = useState("");
   const [places, setPlaces] = useState([]);
-  const [cent, setcent] = useState([46.714382, 24.644584]);
+  const [cent, setcent] = useState([]);
 
   useEffect(() => {
     let map;
@@ -26,7 +25,7 @@ function ShowMap({ onMapClick }) {
         zoomControl: "bottomRight",
         floorControl: "bottomLeft",
       });
-      if (localStorage.getItem("lon") && localStorage.getItem("lat")) {
+      if (cent.length > 0) {
         map.setCenter(cent, {
           animate: true,
           duration: 900,
@@ -42,10 +41,7 @@ function ShowMap({ onMapClick }) {
         }, 800);
 
         new mapglAPI.Marker(map, {
-          coordinates: [
-            localStorage.getItem("lon"),
-            localStorage.getItem("lat"),
-          ],
+          coordinates: [cent[0], cent[1]],
         });
         // setzom(19);
       }
@@ -67,21 +63,12 @@ function ShowMap({ onMapClick }) {
     }
     axios
       .get(
-        `https://catalog.api.2gis.com/3.0/suggests?q=${searchInput}&location=46.711670,24.640437&key=${apiKey}&locale=en_SA`
+        `https://catalog.api.2gis.com/3.0/suggests?q=${searchInput}&fields=items.point&location=46.711670,24.640437&key=${apiKey}&locale=en_SA`
       )
       .then((res) => {
         setData(res.data.result.items);
-        // console.log(data);
-      })
-      .then(
-        axios
-          .get(
-            `https://catalog.api.2gis.com/3.0/markers?q=${searchInput}&location=46.711670,24.640437&key=${apiKey}&locale=en_SA`
-          )
-          .then((res) => {
-            setdatamarker(res.data.result.items[0]);
-          })
-      );
+        console.log(data);
+      });
   }, [searchInput]);
 
   return (
@@ -91,10 +78,10 @@ function ShowMap({ onMapClick }) {
         <div className="flex flex-row w-[400px] gap-1 box-border"></div>
         <input
           type="text"
+          placeholder="search here..."
           id="search"
-          className="m-1 p-2"
+          className="m-1 p-2 border border-solid border-[#a68cfa75]"
           onChange={(e) => {
-            // console.log(e.target.value);
             if (e.target.value != "") {
               setclassN("visible");
               setsearchInput(e.target.value);
@@ -118,9 +105,7 @@ function ShowMap({ onMapClick }) {
                   className="box-border cursor-pointer hover:bg-slate-400 px-[5px] w-full"
                   key={res.id}
                   onClick={() => {
-                    setcent([datamarker.lon, datamarker.lat]);
-                    localStorage.setItem("lon", datamarker.lon);
-                    localStorage.setItem("lat", datamarker.lat);
+                    setcent([res.point.lon, res.point.lat]);
                     setclassN("invisible");
                   }}
                   title={res.address_name}
