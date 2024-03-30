@@ -9,6 +9,7 @@ import axios from "axios";
 
 function ShowMap({ onMapClick }) {
   const [data, setData] = useState([]);
+  const [region, setRegion] = useState([]);
   const [classN, setclassN] = useState("invisible");
   const [classpopup, setclasspopup] = useState("-left-[80%]");
   const [searchInput, setsearchInput] = useState("");
@@ -63,12 +64,22 @@ function ShowMap({ onMapClick }) {
     }
     axios
       .get(
-        `https://catalog.api.2gis.com/3.0/suggests?q=${searchInput}&fields=items.point&location=46.711670,24.640437&key=${apiKey}&locale=en_SA`
+        `https://catalog.api.2gis.com/3.0/suggests?q=${searchInput}&fields=items.point,items.region_id&location=46.711670,24.640437&key=${apiKey}&locale=en_SA`
       )
       .then((res) => {
         setData(res.data.result.items);
-        console.log(data);
-      });
+        // console.log(data);
+      })
+      .then(
+        axios
+          .get(
+            `https://catalog.api.2gis.com/2.0/region/list?q=${searchInput}&key=${apiKey}&locale=en_SA`
+          )
+          .then((res) => {
+            setRegion(res.data.result.items);
+            // console.log(region);
+          })
+      );
   }, [searchInput]);
 
   return (
@@ -132,6 +143,16 @@ function ShowMap({ onMapClick }) {
           <p>X</p>
         </div>
         {places.map((el, i) => {
+          //take region id from suggest API
+          let datamap = data.map((d) => {
+            return d.region_id;
+          });
+          // datamap.push("69");
+          // To compare it with region API
+          let regions = region.filter((reg) => datamap.includes(reg.id));
+
+          console.log(regions);
+
           return (
             <ul
               key={i}
@@ -140,6 +161,10 @@ function ShowMap({ onMapClick }) {
               <li>Name: {el.name}</li>
               <li>Location: {el.address_name}</li>
               <li>Type: {el.type}</li>
+              <li>
+                region:{" "}
+                {regions.length > 0 ? regions.map((re) => re.name) : "Unknown"}
+              </li>
             </ul>
           );
         })}
