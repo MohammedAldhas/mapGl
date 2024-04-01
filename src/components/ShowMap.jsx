@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import MapWrapper from "./MapWrapper";
 import { apiKey } from "../../public/info";
 import axios from "axios";
-import mapboxGl from "mapbox-gl";
 
 // import { useMap } from "../context/MapContext";
 
@@ -73,13 +72,21 @@ function ShowMap({ onMapClick }) {
             map.getBounds().southWest.join(" "),
           ].join(",")
         );
+
+        let northEast = map.getBounds().northEast;
+        let southWest = map.getBounds().southWest;
+        let polygonGeom = northEast[0] + " " + northEast[1] + "," + northEast[0] + " " + southWest[1] + "," + southWest[0] + " " + southWest[1] + "," + southWest[0] + " " + northEast[1];
         // polygon=POLYGON((82.91259527206421 55.0614369017519,82.90572881698608 55.05902823221974,82.91521310806274 55.05580825372468,82.91259527206421 55.0614369017519))
+        // axios
+        //   .get(
+        //     `https://catalog.api.2gis.com/3.0/items/geocode?polygon=POLYGON((${[
+        //       map.getBounds().northEast.join(" "),
+        //       map.getBounds().southWest.join(" "),
+        //     ].join(",")}))&fields=items.point&key=${apiKey}&locale=en_SA`
+        //   )
         axios
           .get(
-            `https://catalog.api.2gis.com/3.0/items/geocode?polygon=POLYGON((${[
-              map.getBounds().northEast.join(" "),
-              map.getBounds().southWest.join(" "),
-            ].join(",")}))&fields=items.point&key=${apiKey}&locale=en_SA`
+            `https://catalog.api.2gis.com/3.0/items/geocode?polygon=POLYGON((${polygonGeom}))&fields=items.point&key=${apiKey}&locale=en_SA`
           )
           .then((res) => {
             setMarkers(res);
