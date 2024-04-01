@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import MapWrapper from "./MapWrapper";
 import { apiKey } from "../../public/info";
 import axios from "axios";
-import mapboxGl from "mapbox-gl";
+// import mapboxGl from "mapbox-gl";
 
 // import { useMap } from "../context/MapContext";
 
