@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import MapWrapper from "./MapWrapper";
 import { apiKey } from "../../public/info";
 import axios from "axios";
+import mapboxGl from "mapbox-gl";
 
 // import { useMap } from "../context/MapContext";
 
@@ -15,9 +16,16 @@ function ShowMap({ onMapClick }) {
   const [searchInput, setsearchInput] = useState("");
   const [places, setPlaces] = useState([]);
   const [cent, setcent] = useState([]);
+  const [markers, setMarkers] = useState([]);
+  const [pl, setpl] = useState({
+    northEast1: "",
+    northEast2: "",
+    southWest1: "",
+    southWest2: "",
+  });
 
+  let map;
   useEffect(() => {
-    let map;
     load().then((mapglAPI) => {
       map = new mapglAPI.Map("map-container", {
         center: [46.714382, 24.644584],
@@ -26,6 +34,13 @@ function ShowMap({ onMapClick }) {
         zoomControl: "bottomRight",
         floorControl: "bottomLeft",
       });
+      console.log(map.getBounds());
+
+      pl.northEast1 = map.getBounds().northEast[0];
+      pl.northEast2 = map.getBounds().northEast[1];
+      pl.southWest1 = map.getBounds().southWest[0];
+      pl.southWest2 = map.getBounds().southWest[1];
+
       if (cent.length > 0) {
         map.setCenter(cent, {
           animate: true,
@@ -46,12 +61,30 @@ function ShowMap({ onMapClick }) {
         });
         // setzom(19);
       }
+
       localStorage.clear();
       // click handel
       map.on("click", (e) => {
         const clickedLngLat = e.lngLat;
         onMapClick(clickedLngLat);
-        setclasspopup("-left-[80%]");
+        console.log(
+          [
+            map.getBounds().northEast.join(" "),
+            map.getBounds().southWest.join(" "),
+          ].join(",")
+        );
+        // polygon=POLYGON((82.91259527206421 55.0614369017519,82.90572881698608 55.05902823221974,82.91521310806274 55.05580825372468,82.91259527206421 55.0614369017519))
+        axios
+          .get(
+            `https://catalog.api.2gis.com/3.0/items/geocode?polygon=POLYGON((${[
+              map.getBounds().northEast.join(" "),
+              map.getBounds().southWest.join(" "),
+            ].join(",")}))&fields=items.point&key=${apiKey}&locale=en_SA`
+          )
+          .then((res) => {
+            setMarkers(res);
+            console.log(markers);
+          });
       });
     });
 
