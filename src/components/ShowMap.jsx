@@ -5,6 +5,7 @@ import MapWrapper from "./MapWrapper";
 import { apiKey } from "../../public/info";
 import axios from "axios";
 
+
 // import { useMap } from "../context/MapContext";
 
 function ShowMap({ onMapClick }) {
