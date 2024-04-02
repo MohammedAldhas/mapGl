@@ -24,7 +24,6 @@ function App() {
         )
         .then((res) => {
           setData(res.data.result.items);
-          // console.log(data);
         });
     }
   }, [lngLat]);
