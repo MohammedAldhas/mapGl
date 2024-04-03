@@ -18,21 +18,20 @@ function ShowMap({ onMapClick }) {
   const [cent, setcent] = useState([]);
   const [markers, setMarkers] = useState([]);
   const [maping, setmaping] = useState(null);
-  const [mapingGl, setmapingGl] = useState({});
+  const [mapingGl, setmapingGl] = useState(null);
 
   useEffect(() => {
     load().then((mapglAPI) => {
       let map = new mapglAPI.Map("map-container", {
         center: [46.714382, 24.644584],
         zoom: 12,
-        key: apiKey,
+        key: "042b5b75-f847-4f2a-b695-b5f58adc9dfd",
         zoomControl: "bottomRight",
         floorControl: "bottomLeft",
       });
       setmaping(map);
 
-      let mymapglAPI = new mapglAPI();
-      setmapingGl(mymapglAPI);
+      setmapingGl(mapglAPI);
     });
 
     return () => maping && maping.destroy();
@@ -99,7 +98,12 @@ function ShowMap({ onMapClick }) {
       maping.on("click", (e) => {
         const clickedLngLat = e.lngLat;
         onMapClick(clickedLngLat);
-        // console.log(markers);
+        // console.log(e.lngLat);
+        // new mapingGl.Marker(maping, {
+        //   coordinates: [e.lngLat[0], e.lngLat[1]],
+        // });
+        // setcent([e.lngLat[0], e.lngLat[1]]);
+        // console.log(cent);
       });
     }
   }, [cent, maping, onMapClick]);
@@ -116,7 +120,6 @@ function ShowMap({ onMapClick }) {
       )
       .then((res) => {
         setData(res.data.result.items);
-        console.log(data);
       })
       .then(
         axios
@@ -131,18 +134,25 @@ function ShowMap({ onMapClick }) {
 
   function clickOnSuggestion(e, arr) {
     // console.log(arr[0], arr[1]);
-    setcent([arr]);
-    // console.log(cent);
+    setcent(arr);
+
     setclassN("invisible");
     // setcent([res.point.lon, res.point.lat]);
     //                   setclassN("invisible");
   }
   function comparefunc(e) {
-    if (markers.length != 0) {
+    // let coords = [];
+    if (markers) {
       markers.map((w) => {
         if (w.type == e.target.innerText) {
-          setcent(e.point);
-          console.log(w);
+          // coords.push([w.point.lat, w.point.lon]);
+          console.log("good");
+          new mapingGl.Marker(maping, {
+            coordinates: [w.point.lat, w.point.lon],
+            label: {
+              text: `${w.full_name}`,
+            },
+          });
         }
       });
     }
