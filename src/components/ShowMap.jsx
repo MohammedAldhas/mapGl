@@ -19,6 +19,7 @@ function ShowMap({ onMapClick }) {
   const [markers, setMarkers] = useState([]);
   const [maping, setmaping] = useState(null);
   const [mapingGl, setmapingGl] = useState(null);
+  const [pl, setpl] = useState([]);
 
   useEffect(() => {
     load().then((mapglAPI) => {
@@ -66,7 +67,7 @@ function ShowMap({ onMapClick }) {
         let southWest = bounds.southWest;
         // let northEast = mapgl.getBounds().northEast;
         // let southWest = mapgl.getBounds().southWest;
-
+        // n0 n1, n0 s1, s0 s1, s0 n1, n0 n1
         let polygonGeom =
           northEast[0] +
           " " +
@@ -82,11 +83,17 @@ function ShowMap({ onMapClick }) {
           "," +
           southWest[0] +
           " " +
+          northEast[1] +
+          "," +
+          northEast[0] +
+          " " +
           northEast[1];
+
+        setpl(polygonGeom);
 
         axios
           .get(
-            `https://catalog.api.2gis.com/3.0/items/geocode?polygon=POLYGON((${polygonGeom}))&fields=items.point&key=${apiKey}&locale=en_SA`
+            `https://catalog.api.2gis.com/3.0/items/geocode?polygon=POLYGON((${pl}))&fields=items.point&key=${apiKey}&locale=en_SA`
           )
           .then(maping.setZoom(16))
           .then((res) => {
@@ -98,15 +105,9 @@ function ShowMap({ onMapClick }) {
       maping.on("click", (e) => {
         const clickedLngLat = e.lngLat;
         onMapClick(clickedLngLat);
-        // console.log(e.lngLat);
-        // new mapingGl.Marker(maping, {
-        //   coordinates: [e.lngLat[0], e.lngLat[1]],
-        // });
-        // setcent([e.lngLat[0], e.lngLat[1]]);
-        // console.log(cent);
       });
     }
-  }, [cent, maping, onMapClick]);
+  }, [cent, maping, pl]);
 
   // ==================================================
 
@@ -140,15 +141,17 @@ function ShowMap({ onMapClick }) {
     // setcent([res.point.lon, res.point.lat]);
     //                   setclassN("invisible");
   }
+
   function comparefunc(e) {
     // let coords = [];
     if (markers) {
+      // console.log("Good");
       markers.map((w) => {
         if (w.type == e.target.innerText) {
-          // coords.push([w.point.lat, w.point.lon]);
-          console.log("good");
+          console.log(pl);
+          console.log(w);
           new mapingGl.Marker(maping, {
-            coordinates: [w.point.lat, w.point.lon],
+            coordinates: [w.point.lon, w.point.lat],
             label: {
               text: `${w.full_name}`,
             },
@@ -217,7 +220,7 @@ function ShowMap({ onMapClick }) {
             street
           </li>
           <li className="cursor-pointer" onClick={(e) => comparefunc(e)}>
-            parking
+            org
           </li>
           <li className="cursor-pointer" onClick={(e) => comparefunc(e)}>
             station
