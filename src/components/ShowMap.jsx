@@ -160,6 +160,12 @@ function ShowMap({ onMapClick }) {
       });
     }
   }
+  function goToLoc(point) {
+    if (markers) {
+      setcent([point.lon, point.lat]);
+      console.log(point.lat, point.lon);
+    }
+  }
 
   return (
     <>
@@ -252,6 +258,9 @@ function ShowMap({ onMapClick }) {
           // This shows when you press Enter
           return (
             <PlacesInfo
+              handel={() => {
+                goToLoc(el.point);
+              }}
               key={i}
               name={el.name}
               address_name={el.address_name}
