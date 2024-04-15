@@ -7,6 +7,7 @@ import { apiKey } from "../../public/info";
 import Suggest from "./Suggest";
 import axios from "axios";
 import PlacesInfo from "./PlacesInfo";
+import Catag from "./Catag";
 
 function ShowMap({ onMapClick }) {
   const [data, setData] = useState([]);
@@ -16,10 +17,8 @@ function ShowMap({ onMapClick }) {
   const [searchInput, setsearchInput] = useState("");
   const [places, setPlaces] = useState([]);
   const [cent, setcent] = useState([]);
-  const [markers, setMarkers] = useState([]);
   const [maping, setmaping] = useState(null);
   const [mapingGl, setmapingGl] = useState(null);
-  const [pl, setpl] = useState([]);
 
   useEffect(() => {
     load().then((mapglAPI) => {
@@ -54,60 +53,19 @@ function ShowMap({ onMapClick }) {
         });
       }, 800);
 
-      // THE PROBLEM IS HERE
       new mapingGl.Marker(maping, {
         coordinates: [cent[0], cent[1]],
       });
     }
     if (maping) {
-      let bounds = maping.getBounds();
-
-      if (bounds) {
-        let northEast = bounds.northEast;
-        let southWest = bounds.southWest;
-        // let northEast = mapgl.getBounds().northEast;
-        // let southWest = mapgl.getBounds().southWest;
-        // n0 n1, n0 s1, s0 s1, s0 n1, n0 n1
-        let polygonGeom =
-          northEast[0] +
-          " " +
-          northEast[1] +
-          "," +
-          northEast[0] +
-          " " +
-          southWest[1] +
-          "," +
-          southWest[0] +
-          " " +
-          southWest[1] +
-          "," +
-          southWest[0] +
-          " " +
-          northEast[1] +
-          "," +
-          northEast[0] +
-          " " +
-          northEast[1];
-
-        setpl(polygonGeom);
-
-        axios
-          .get(
-            `https://catalog.api.2gis.com/3.0/items/geocode?polygon=POLYGON((${pl}))&fields=items.point&key=${apiKey}&locale=en_SA`
-          )
-          .then(maping.setZoom(16))
-          .then((res) => {
-            setMarkers(res.data.result.items);
-          });
-      }
-
       // click handel map click
       maping.on("click", (e) => {
         const clickedLngLat = e.lngLat;
         onMapClick(clickedLngLat);
+        setclassN("invisible");
       });
     }
-  }, [cent, maping, pl]);
+  }, [cent, maping]);
 
   // ==================================================
 
@@ -133,51 +91,25 @@ function ShowMap({ onMapClick }) {
       );
   }, [searchInput]);
 
-  function clickOnSuggestion(e, arr) {
-    // console.log(arr[0], arr[1]);
+  function clickOnSuggestion(arr) {
     setcent(arr);
-
     setclassN("invisible");
-    // setcent([res.point.lon, res.point.lat]);
-    //                   setclassN("invisible");
   }
 
-  function comparefunc(e) {
-    // let coords = [];
-    if (markers) {
-      // console.log("Good");
-      markers.map((w) => {
-        if (w.type == e.target.innerText) {
-          console.log(pl);
-          console.log(w);
-          new mapingGl.Marker(maping, {
-            coordinates: [w.point.lon, w.point.lat],
-            label: {
-              text: `${w.full_name}`,
-            },
-          });
-        }
-      });
-    }
-  }
   function goToLoc(point) {
-    if (markers) {
+    if (places) {
       setcent([point.lon, point.lat]);
-      console.log(point.lat, point.lon);
     }
   }
-
   return (
     <>
       <div className="w-full h-[100vh]">
         <MapWrapper />
-
-        {/* <div className="flex flex-row w-[400px] gap-1 box-border"></div> */}
         <input
           type="text"
           placeholder="search here..."
           id="search"
-          className="m-1 p-2 border border-solid border-[#a68cfa75]"
+          className="box-border m-1 p-2 border border-solid border-[#a68cfa75]"
           onChange={(e) => {
             if (e.target.value != "") {
               setclassN("visible");
@@ -190,20 +122,22 @@ function ShowMap({ onMapClick }) {
             if (e.key === "Enter") {
               setPlaces(data);
               setclasspopup("left-0");
+              setclassN("invisible");
             }
           }}
         />
         <div id="suggest" className={`${classN}`}>
           {data.length > 0 ? (
             data.map((res) => {
+              // console.log(res);
               return (
                 <>
                   <Suggest
                     id={res.id}
                     address_name={res.address_name}
                     name={res.name}
-                    handle={(e) => {
-                      clickOnSuggestion(e, [res.point.lon, res.point.lat]);
+                    handle={() => {
+                      clickOnSuggestion([res.point.lon, res.point.lat]);
                     }}
                   />
                 </>
@@ -214,25 +148,8 @@ function ShowMap({ onMapClick }) {
           )}
         </div>
       </div>
-      <div className="box-border p-3 shadow m-2 border-2 border-solid border-[#00000037] rounded-xl w-[280px] text-sm absolute top-[110px] right-0 bg-[#f5deb3c4]">
-        <ul className="flex flex-row justify-between">
-          <li className="cursor-pointer" onClick={(e) => comparefunc(e)}>
-            branch
-          </li>
-          <li className="cursor-pointer" onClick={(e) => comparefunc(e)}>
-            building
-          </li>
-          <li className="cursor-pointer" onClick={(e) => comparefunc(e)}>
-            street
-          </li>
-          <li className="cursor-pointer" onClick={(e) => comparefunc(e)}>
-            org
-          </li>
-          <li className="cursor-pointer" onClick={(e) => comparefunc(e)}>
-            station
-          </li>
-        </ul>
-      </div>
+      <Catag maping={maping} mapingGl={mapingGl} />
+
       <div
         className={`box-border absolute top-[1px] transition-[${classpopup}] ease-in-out duration-700 ${classpopup} w-[550px] h-[99vh] overflow-auto bg-white z-50 box-border`}
         id="scrollStyling"
