@@ -5,12 +5,17 @@ import { apiKey } from "../../public/info";
 
 function Catag(props) {
   const [markers, setMarkers] = useState([]);
-  const [types, settypes] = useState("branch");
+  const [types, settypes] = useState();
   const [markerPoint] = useState([]);
   useEffect(() => {
     let bounds;
     if (props.maping) {
       bounds = props.maping.getBounds();
+      props.maping.setZoom(16, {
+        animate: true,
+        duration: 500,
+        easing: "linear",
+      });
     }
     if (bounds) {
       let northEast = bounds.northEast;
@@ -36,22 +41,18 @@ function Catag(props) {
       // `https://catalog.api.2gis.com/3.0/items/geocode?polygon=POLYGON((${polygonGeom}))&fields=items.point&key=${apiKey}&locale=en_SA`
       axios
         .get(
-          `https://catalog.api.2gis.com/3.0/markers?type=${types}&polygon=POLYGON((${polygonGeom}))&key=${apiKey}&locale=en_SA`
+          `https://catalog.api.2gis.com/3.0/items/geocode?polygon=POLYGON((${polygonGeom}))&fields=items.point&key=${apiKey}&locale=en_SA`
         )
         .then((res) => {
           setMarkers(res.data.result.items);
+        })
+        .then(() => {
+          comparefunc();
         });
     }
   }, [types]);
 
-  function comparefunc(type) {
-    settypes(type);
-
-    props.maping.setZoom(16, {
-      animate: true,
-      duration: 500,
-      easing: "linear",
-    });
+  function comparefunc() {
     if (markerPoint.length > 0) {
       markerPoint.forEach((mrk) => {
         mrk.destroy();
@@ -59,11 +60,16 @@ function Catag(props) {
     }
     if (markers) {
       markers.map((w) => {
-        markerPoint.push(
-          new props.mapingGl.Marker(props.maping, {
-            coordinates: [w.lon, w.lat],
-          })
-        );
+        console.log(w.type);
+        if (w.type === types) {
+          console.log(w.type);
+
+          markerPoint.push(
+            new props.mapingGl.Marker(props.maping, {
+              coordinates: [w.point.lon, w.point.lat],
+            })
+          );
+        }
       });
     }
   }
@@ -73,31 +79,42 @@ function Catag(props) {
       <ul className="flex flex-row justify-between">
         <li
           className="cursor-pointer"
-          onClick={(e) => comparefunc(e.target.innerText)}
+          onClick={(e) => {
+            // settypes(e.target.innerText);
+            settypes(e.target.innerText);
+          }}
         >
           branch
         </li>
         <li
           className="cursor-pointer"
-          onClick={(e) => comparefunc(e.target.innerText)}
+          onClick={(e) => {
+            settypes(e.target.innerText);
+          }}
         >
           building
         </li>
         <li
           className="cursor-pointer"
-          onClick={(e) => comparefunc(e.target.innerText)}
+          onClick={(e) => {
+            settypes(e.target.innerText);
+          }}
         >
           street
         </li>
         <li
           className="cursor-pointer"
-          onClick={(e) => comparefunc(e.target.innerText)}
+          onClick={(e) => {
+            settypes(e.target.innerText);
+          }}
         >
           org
         </li>
         <li
           className="cursor-pointer"
-          onClick={(e) => comparefunc(e.target.innerText)}
+          onClick={(e) => {
+            settypes(e.target.innerText);
+          }}
         >
           station
         </li>

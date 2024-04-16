@@ -128,10 +128,10 @@ function ShowMap({ onMapClick }) {
         />
         <div id="suggest" className={`${classN}`}>
           {data.length > 0 ? (
-            data.map((res) => {
+            data.map((res, id) => {
               // console.log(res);
               return (
-                <>
+                <div key={id}>
                   <Suggest
                     id={res.id}
                     address_name={res.address_name}
@@ -140,7 +140,7 @@ function ShowMap({ onMapClick }) {
                       clickOnSuggestion([res.point.lon, res.point.lat]);
                     }}
                   />
-                </>
+                </div>
               );
             })
           ) : (
