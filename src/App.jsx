@@ -35,7 +35,7 @@ function App() {
   return (
     <>
       <ShowMap onMapClick={handleMapClick} />
-      {/* <div className=""> */}
+
       <div
         className={`${classN} box-border p-3 shadow m-2 border-2 border-solid border-[#00000037] rounded-xl w-[280px] text-sm absolute top-0 right-0 bg-[#f5deb3c4]`}
       >
@@ -46,8 +46,8 @@ function App() {
           lang: {data[0].point ? data[0].point.lat : ""} lon:{" "}
           {data[0].point ? data[0].point.lon : ""}
         </p>
+        <p>type:{data[0].type}</p>
       </div>
-      {/* </div> */}
     </>
   );
 }

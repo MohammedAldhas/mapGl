@@ -7,6 +7,26 @@ function Catag(props) {
   const [markers, setMarkers] = useState([]);
   const [types, settypes] = useState();
   const [markerPoint] = useState([]);
+
+  const lists = [
+    { id: 1, text: "branch" },
+    { id: 2, text: "building" },
+    { id: 3, text: "street" },
+    { id: 4, text: "org" },
+    { id: 5, text: "station" },
+  ];
+
+  const listsElement = lists.map((list) => {
+    return (
+      <li key={list.id} className="cursor-pointer" onClick={clicked}>
+        {list.text}
+      </li>
+    );
+  });
+
+  function clicked(e) {
+    settypes(e.target.innerText);
+  }
   useEffect(() => {
     let bounds;
     if (props.maping) {
@@ -39,6 +59,7 @@ function Catag(props) {
         southWest[1];
 
       // `https://catalog.api.2gis.com/3.0/items/geocode?polygon=POLYGON((${polygonGeom}))&fields=items.point&key=${apiKey}&locale=en_SA`
+      //   https://catalog.api.2gis.com/3.0/markers?type=${types}&polygon=POLYGON((${polygonGeom}))&key=${apiKey}&locale=en_SA
       axios
         .get(
           `https://catalog.api.2gis.com/3.0/items/geocode?polygon=POLYGON((${polygonGeom}))&fields=items.point&key=${apiKey}&locale=en_SA`
@@ -60,7 +81,7 @@ function Catag(props) {
     }
     if (markers) {
       markers.map((w) => {
-        console.log(w.type);
+        console.log(w);
         if (w.type === types) {
           console.log(w.type);
 
@@ -76,49 +97,7 @@ function Catag(props) {
 
   return (
     <div className="box-border p-3 shadow m-2 border-2 border-solid border-[#00000037] rounded-xl w-[280px] text-sm absolute bottom-0 right-10 bg-[#f5deb3c4]">
-      <ul className="flex flex-row justify-between">
-        <li
-          className="cursor-pointer"
-          onClick={(e) => {
-            // settypes(e.target.innerText);
-            settypes(e.target.innerText);
-          }}
-        >
-          branch
-        </li>
-        <li
-          className="cursor-pointer"
-          onClick={(e) => {
-            settypes(e.target.innerText);
-          }}
-        >
-          building
-        </li>
-        <li
-          className="cursor-pointer"
-          onClick={(e) => {
-            settypes(e.target.innerText);
-          }}
-        >
-          street
-        </li>
-        <li
-          className="cursor-pointer"
-          onClick={(e) => {
-            settypes(e.target.innerText);
-          }}
-        >
-          org
-        </li>
-        <li
-          className="cursor-pointer"
-          onClick={(e) => {
-            settypes(e.target.innerText);
-          }}
-        >
-          station
-        </li>
-      </ul>
+      <ul className="flex flex-row justify-between">{listsElement}</ul>
     </div>
   );
 }
