@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { apiKey } from "../../public/info";
 
-function Catag(props) {
+export default function Catag({ maping, mapingGl }) {
   const [markers, setMarkers] = useState([]);
   const [types, settypes] = useState();
   const [markerPoint] = useState([]);
@@ -18,20 +18,23 @@ function Catag(props) {
 
   const listsElement = lists.map((list) => {
     return (
-      <li key={list.id} className="cursor-pointer" onClick={clicked}>
+      <li
+        key={list.id}
+        className="cursor-pointer"
+        onClick={(e) => {
+          settypes(e.target.innerText);
+        }}
+      >
         {list.text}
       </li>
     );
   });
 
-  function clicked(e) {
-    settypes(e.target.innerText);
-  }
   useEffect(() => {
     let bounds;
-    if (props.maping) {
-      bounds = props.maping.getBounds();
-      props.maping.setZoom(16, {
+    if (maping) {
+      bounds = maping.getBounds();
+      maping.setZoom(16, {
         animate: true,
         duration: 500,
         easing: "linear",
@@ -65,6 +68,7 @@ function Catag(props) {
           `https://catalog.api.2gis.com/3.0/items/geocode?polygon=POLYGON((${polygonGeom}))&fields=items.point&key=${apiKey}&locale=en_SA`
         )
         .then((res) => {
+          //   console.log(res.data.meta);
           setMarkers(res.data.result.items);
         })
         .then(() => {
@@ -81,12 +85,10 @@ function Catag(props) {
     }
     if (markers) {
       markers.map((w) => {
-        console.log(w);
+        console.log(w.type);
         if (w.type === types) {
-          console.log(w.type);
-
           markerPoint.push(
-            new props.mapingGl.Marker(props.maping, {
+            new mapingGl.Marker(maping, {
               coordinates: [w.point.lon, w.point.lat],
             })
           );
@@ -101,5 +103,3 @@ function Catag(props) {
     </div>
   );
 }
-
-export default Catag;

@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-function Suggest(props) {
+export default function Suggest(props) {
   return (
     <>
       <p
@@ -13,5 +13,3 @@ function Suggest(props) {
     </>
   );
 }
-
-export default Suggest;

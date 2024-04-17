@@ -9,7 +9,7 @@ import axios from "axios";
 import PlacesInfo from "./PlacesInfo";
 import Catag from "./Catag";
 
-function ShowMap({ onMapClick }) {
+export default function ShowMap({ onMapClick }) {
   const [data, setData] = useState([]);
   const [region, setRegion] = useState([]);
   const [classN, setclassN] = useState("invisible");
@@ -63,6 +63,7 @@ function ShowMap({ onMapClick }) {
         const clickedLngLat = e.lngLat;
         onMapClick(clickedLngLat);
         setclassN("invisible");
+        setclasspopup("-left-[80%]");
       });
     }
   }, [cent, maping]);
@@ -106,6 +107,7 @@ function ShowMap({ onMapClick }) {
       <div className="w-full h-[100vh]">
         <MapWrapper />
         <input
+          value={searchInput}
           type="text"
           placeholder="search here..."
           id="search"
@@ -129,7 +131,6 @@ function ShowMap({ onMapClick }) {
         <div id="suggest" className={`${classN}`}>
           {data.length > 0 ? (
             data.map((res, id) => {
-              // console.log(res);
               return (
                 <div key={id}>
                   <Suggest
@@ -154,13 +155,15 @@ function ShowMap({ onMapClick }) {
         className={`box-border absolute top-[1px] transition-[${classpopup}] ease-in-out duration-700 ${classpopup} w-[550px] h-[99vh] overflow-auto bg-white z-50 box-border`}
         id="scrollStyling"
       >
-        <div
-          className="bg-red-400 w-[25px] h-[25px] rounded-full absolute top-0 right-1 cursor-pointer flex justify-center items-center text-zinc-200 hover:scale-105"
-          onClick={() => {
-            setclasspopup("-left-[80%]");
-          }}
-        >
-          <p>X</p>
+        <div className="w-full flex justify-end items-center sticky top-1 right-1">
+          <div
+            className="bg-red-400 w-[25px] h-[25px] rounded-full  cursor-pointer flex justify-center items-center text-zinc-200 hover:scale-105"
+            onClick={() => {
+              setclasspopup("-left-[80%]");
+            }}
+          >
+            <p>X</p>
+          </div>
         </div>
 
         {/* all places info */}
@@ -192,5 +195,3 @@ function ShowMap({ onMapClick }) {
     </>
   );
 }
-
-export default ShowMap;

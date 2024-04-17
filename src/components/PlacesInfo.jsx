@@ -1,7 +1,5 @@
 /* eslint-disable react/prop-types */
-// /* eslint-disable react/prop-types */
-
-function PlacesInfo(props) {
+export default function PlacesInfo(props) {
   const lists = [
     { id: 1, text: "Name:", data: props.name },
     { id: 2, text: "Location:", data: props.address_name },
@@ -19,7 +17,6 @@ function PlacesInfo(props) {
   return (
     <>
       <ul
-        // key={i}
         className="box-border p-3 shadow m-2 border-2 border-solid border-[#00000037] rounded-xl cursor-pointer hover:scale-[1.01]"
         onClick={props.handel}
       >
@@ -28,5 +25,3 @@ function PlacesInfo(props) {
     </>
   );
 }
-
-export default PlacesInfo;

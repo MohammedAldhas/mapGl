@@ -3,7 +3,7 @@ import { apiKey } from "../public/info";
 import axios from "axios";
 import ShowMap from "./components/ShowMap";
 
-function App() {
+export default function App() {
   const [data, setData] = useState([""]);
   const [lngLat, setLngLat] = useState(null);
   const [classN, setclassN] = useState("invisible");
@@ -16,7 +16,6 @@ function App() {
   useEffect(() => {
     if (lngLat != null) {
       hideElm();
-
       //gecoder API
       axios
         .get(
@@ -51,5 +50,3 @@ function App() {
     </>
   );
 }
-
-export default App;
