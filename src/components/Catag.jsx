@@ -4,9 +4,8 @@ import axios from "axios";
 import { apiKey } from "../../public/info";
 
 export default function Catag({ maping, mapingGl }) {
-  const [markers, setMarkers] = useState([]);
   const [types, settypes] = useState();
-  const [markerPoint] = useState([]);
+  const [markerPoint, setMarkerPoint] = useState([]);
 
   const lists = [
     { id: 1, text: "branch" },
@@ -22,7 +21,15 @@ export default function Catag({ maping, mapingGl }) {
         key={list.id}
         className="cursor-pointer"
         onClick={(e) => {
-          settypes(e.target.innerText);
+          maping.setZoom(16, {
+            animate: true,
+            duration: 500,
+            easing: "linear",
+          });
+
+          setTimeout(() => {
+            settypes(e.target.innerText);
+          }, 600);
         }}
       >
         {list.text}
@@ -34,11 +41,6 @@ export default function Catag({ maping, mapingGl }) {
     let bounds;
     if (maping) {
       bounds = maping.getBounds();
-      maping.setZoom(16, {
-        animate: true,
-        duration: 500,
-        easing: "linear",
-      });
     }
     if (bounds) {
       let northEast = bounds.northEast;
@@ -61,40 +63,38 @@ export default function Catag({ maping, mapingGl }) {
         " " +
         southWest[1];
 
+      // https://catalog.api.2gis.com/3.0/items?polygon=POLYGON((${polygonGeom}))&fields=items.point&key=${apiKey}
       // `https://catalog.api.2gis.com/3.0/items/geocode?polygon=POLYGON((${polygonGeom}))&fields=items.point&key=${apiKey}&locale=en_SA`
       //   https://catalog.api.2gis.com/3.0/markers?type=${types}&polygon=POLYGON((${polygonGeom}))&key=${apiKey}&locale=en_SA
       axios
         .get(
-          `https://catalog.api.2gis.com/3.0/items/geocode?polygon=POLYGON((${polygonGeom}))&fields=items.point&key=${apiKey}&locale=en_SA`
+          `https://catalog.api.2gis.com/3.0/markers?type=${types}&polygon=POLYGON((${polygonGeom}))&key=demo&locale=en_SA`
         )
         .then((res) => {
-          //   console.log(res.data.meta);
-          setMarkers(res.data.result.items);
-        })
-        .then(() => {
-          comparefunc();
+          if (res.data.result.items.length > 500) {
+            res.data.result.items.length = 500;
+          }
+          comparefunc(res.data.result.items);
         });
     }
   }, [types]);
 
-  function comparefunc() {
+  function comparefunc(data) {
     if (markerPoint.length > 0) {
       markerPoint.forEach((mrk) => {
         mrk.destroy();
       });
     }
-    if (markers) {
-      markers.map((w) => {
-        console.log(w.type);
-        if (w.type === types) {
-          markerPoint.push(
-            new mapingGl.Marker(maping, {
-              coordinates: [w.point.lon, w.point.lat],
-            })
-          );
-        }
-      });
-    }
+    data.map((w) => {
+      //   console.log(w);
+      //   if (w.type === types) {
+      markerPoint.push(
+        new mapingGl.Marker(maping, {
+          coordinates: [w.lon, w.lat],
+        })
+      );
+      //   }
+    });
   }
 
   return (
