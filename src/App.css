@@ -2,6 +2,8 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  font-family: "Cairo", sans-serif;
+  font-size: medium;
 }
 
 #search {
@@ -57,3 +59,6 @@
   background-color: rgb(59 130 246 / 0.5);
   border-radius: 10px;
 }
+/* .material-symbols-outlined {
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+} */

@@ -102,6 +102,16 @@ export default function ShowMap({ onMapClick }) {
       setcent([point.lon, point.lat]);
     }
   }
+
+  function catagClicked(e) {
+    setsearchInput("");
+    // console.log(e.target.nodeName);
+    if (e.target.nodeName == "P") {
+      setsearchInput(e.target.innerText);
+    } else {
+      setsearchInput(e.target.previousElementSibling.innerText);
+    }
+  }
   return (
     <>
       <div className="w-full h-[100vh]">
@@ -128,7 +138,7 @@ export default function ShowMap({ onMapClick }) {
             }
           }}
         />
-        <div id="suggest" className={`${classN}`}>
+        <div id="suggest" className={`${classN} text-center font-semibold`}>
           {data.length > 0 ? (
             data.map((res, id) => {
               return (
@@ -149,7 +159,7 @@ export default function ShowMap({ onMapClick }) {
           )}
         </div>
       </div>
-      <Catag maping={maping} mapingGl={mapingGl} />
+      <Catag maping={maping} mapingGl={mapingGl} clicked={catagClicked} />
 
       <div
         className={`box-border absolute top-[1px] transition-[${classpopup}] ease-in-out duration-700 ${classpopup} w-[550px] h-[99vh] overflow-auto bg-white z-50 box-border`}

@@ -1,38 +1,61 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { apiKey } from "../../public/info";
 
-export default function Catag({ maping, mapingGl }) {
+export default function Catag({ maping, mapingGl, clicked }) {
   const [types, settypes] = useState();
-  const [markerPoint, setMarkerPoint] = useState([]);
+  const [markerPoint] = useState([]);
+  const [data, setdata] = useState([]);
+  const [className, setclassName] = useState("hidden");
+  const [loading, setloading] = useState("loading...");
+
+  if (maping) {
+    maping.on("click", () => {
+      setclassName("hidden");
+    });
+  }
 
   const lists = [
-    { id: 1, text: "branch" },
-    { id: 2, text: "building" },
-    { id: 3, text: "street" },
-    { id: 4, text: "org" },
-    { id: 5, text: "station" },
+    { id: 1, text: "restaurants", icon: "restaurant" },
+    { id: 2, text: "cafes", icon: "local_cafe" },
+    { id: 3, text: "malls", icon: "local_mall" },
+    { id: 4, text: "hotels", icon: "hotel" },
+    { id: 5, text: "stations", icon: "local_gas_station" },
+    { id: 6, text: "mosques", icon: "mosque" },
   ];
 
   const listsElement = lists.map((list) => {
     return (
       <li
         key={list.id}
-        className="cursor-pointer"
+        className="cursor-pointer shadow px-3 h-8 rounded-full flex justify-center items-center gap-1 bg-white align-middle hover:bg-slate-100"
         onClick={(e) => {
-          maping.setZoom(16, {
+          setdata([]);
+          settypes("");
+          maping.setZoom(15, {
             animate: true,
             duration: 500,
             easing: "linear",
           });
 
           setTimeout(() => {
-            settypes(e.target.innerText);
+            if (e.target.nodeName == "P") {
+              settypes(e.target.innerText);
+            } else {
+              settypes(e.target.previousElementSibling.innerText);
+            }
           }, 600);
+          clicked(e);
+
+          setclassName("block");
+          setloading("loading...");
+          setTimeout(() => {
+            setloading("There is no places in currunt area");
+          }, 1000);
         }}
       >
-        {list.text}
+        <p>{list.text}</p>
+        <span className="material-symbols-outlined">{list.icon}</span>
       </li>
     );
   });
@@ -66,14 +89,13 @@ export default function Catag({ maping, mapingGl }) {
       // https://catalog.api.2gis.com/3.0/items?polygon=POLYGON((${polygonGeom}))&fields=items.point&key=${apiKey}
       // `https://catalog.api.2gis.com/3.0/items/geocode?polygon=POLYGON((${polygonGeom}))&fields=items.point&key=${apiKey}&locale=en_SA`
       //   https://catalog.api.2gis.com/3.0/markers?type=${types}&polygon=POLYGON((${polygonGeom}))&key=${apiKey}&locale=en_SA
+      //   https://catalog.api.2gis.com/3.0/markers?type=${types}&polygon=POLYGON((${polygonGeom}))&fields=items.name_ex&key=demo&locale=en_SA
       axios
         .get(
-          `https://catalog.api.2gis.com/3.0/markers?type=${types}&polygon=POLYGON((${polygonGeom}))&key=demo&locale=en_SA`
+          `https://catalog.api.2gis.com/3.0/items?q=${types}&polygon=POLYGON((${polygonGeom}))&fields=items.point&key=demo&locale=en_SA`
         )
         .then((res) => {
-          if (res.data.result.items.length > 500) {
-            res.data.result.items.length = 500;
-          }
+          setdata(res.data.result.items);
           comparefunc(res.data.result.items);
         });
     }
@@ -86,20 +108,60 @@ export default function Catag({ maping, mapingGl }) {
       });
     }
     data.map((w) => {
-      //   console.log(w);
-      //   if (w.type === types) {
       markerPoint.push(
         new mapingGl.Marker(maping, {
-          coordinates: [w.lon, w.lat],
+          coordinates: [w.point.lon, w.point.lat],
+          icon: "https://docs.2gis.com/img/mapgl/marker.svg",
         })
       );
-      //   }
     });
   }
 
+  const textDataList = data.map((dat, ind) => {
+    return (
+      <p
+        className="text-center rounded-md hover:bg-slate-400 hover:cursor-pointer"
+        key={ind}
+        title={dat.address_name}
+        onClick={() => {
+          setclassName("hidden");
+
+          if (markerPoint.length > 0) {
+            markerPoint.forEach((mrk) => {
+              mrk.destroy();
+            });
+          }
+          new mapingGl.Marker(maping, {
+            coordinates: [dat.point.lon, dat.point.lat],
+          });
+          maping.setCenter([dat.point.lon, dat.point.lat], {
+            animate: true,
+            duration: 900,
+            easing: "linear",
+          });
+          maping.setZoom(15, {
+            animate: true,
+            duration: 500,
+            easing: "linear",
+          });
+        }}
+      >
+        {dat.name}
+        <hr />
+      </p>
+    );
+  });
+
   return (
-    <div className="box-border p-3 shadow m-2 border-2 border-solid border-[#00000037] rounded-xl w-[280px] text-sm absolute bottom-0 right-10 bg-[#f5deb3c4]">
-      <ul className="flex flex-row justify-between">{listsElement}</ul>
+    <div className="absolute bottom-2 right-12 box-border">
+      <div
+        className={`bg-white w-full h-80 mb-2 rounded-lg overflow-auto text-center font-bold ${className}`}
+      >
+        {textDataList.length > 0 ? textDataList.map((d) => d) : loading}
+      </div>
+      <ul className="flex flex-row-reverse justify-between gap-1">
+        {listsElement}
+      </ul>
     </div>
   );
 }
