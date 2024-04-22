@@ -25,7 +25,7 @@ export default function ShowMap({ onMapClick }) {
       let map = new mapglAPI.Map("map-container", {
         center: [46.714382, 24.644584],
         zoom: 12,
-        key: "042b5b75-f847-4f2a-b695-b5f58adc9dfd",
+        key: apiKey,
         zoomControl: "bottomRight",
         floorControl: "bottomLeft",
       });
@@ -167,7 +167,7 @@ export default function ShowMap({ onMapClick }) {
       >
         <div className="w-full flex justify-end items-center sticky top-1 right-1">
           <div
-            className="bg-red-400 w-[25px] h-[25px] rounded-full  cursor-pointer flex justify-center items-center text-zinc-200 hover:scale-105"
+            className="bg-red-400 w-[25px] h-[25px] rounded-full  cursor-pointer flex justify-center items-center text-zinc-200 hover:scale-105 hover:bg-red-700"
             onClick={() => {
               setclasspopup("-left-[80%]");
             }}

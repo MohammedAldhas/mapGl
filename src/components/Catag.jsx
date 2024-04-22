@@ -5,6 +5,7 @@ import axios from "axios";
 export default function Catag({ maping, mapingGl, clicked }) {
   const [types, settypes] = useState();
   const [markerPoint] = useState([]);
+  const [showMAarker] = useState([]);
   const [data, setdata] = useState([]);
   const [className, setclassName] = useState("hidden");
   const [loading, setloading] = useState("loading...");
@@ -14,7 +15,6 @@ export default function Catag({ maping, mapingGl, clicked }) {
       setclassName("hidden");
     });
   }
-
   const lists = [
     { id: 1, text: "restaurants", icon: "restaurant" },
     { id: 2, text: "cafes", icon: "local_cafe" },
@@ -32,17 +32,17 @@ export default function Catag({ maping, mapingGl, clicked }) {
         onClick={(e) => {
           setdata([]);
           settypes("");
-          maping.setZoom(15, {
-            animate: true,
-            duration: 500,
-            easing: "linear",
-          });
+          //   maping.setZoom(15, {
+          //     animate: true,
+          //     duration: 500,
+          //     easing: "linear",
+          //   });
 
           setTimeout(() => {
             if (e.target.nodeName == "P") {
-              settypes(e.target.innerText);
+              settypes(e.target.innerText.slice(0, -1));
             } else {
-              settypes(e.target.previousElementSibling.innerText);
+              settypes(e.target.previousElementSibling.innerText.slice(0, -1));
             }
           }, 600);
           clicked(e);
@@ -118,11 +118,25 @@ export default function Catag({ maping, mapingGl, clicked }) {
   }
 
   const textDataList = data.map((dat, ind) => {
+    function showOnMap() {
+      if (showMAarker.length > 0) {
+        showMAarker.forEach((mrk) => {
+          mrk.destroy();
+        });
+      }
+      //   data.map((w) => {
+      showMAarker.push(
+        new mapingGl.Marker(maping, {
+          coordinates: [dat.point.lon, dat.point.lat],
+        })
+      );
+    }
     return (
       <p
         className="text-center rounded-md hover:bg-slate-400 hover:cursor-pointer"
         key={ind}
         title={dat.address_name}
+        onMouseEnter={showOnMap}
         onClick={() => {
           setclassName("hidden");
 
@@ -131,17 +145,16 @@ export default function Catag({ maping, mapingGl, clicked }) {
               mrk.destroy();
             });
           }
-          new mapingGl.Marker(maping, {
-            coordinates: [dat.point.lon, dat.point.lat],
-          });
+          showOnMap;
+
           maping.setCenter([dat.point.lon, dat.point.lat], {
             animate: true,
-            duration: 900,
+            duration: 500,
             easing: "linear",
           });
-          maping.setZoom(15, {
+          maping.setZoom(19, {
             animate: true,
-            duration: 500,
+            duration: 800,
             easing: "linear",
           });
         }}
@@ -153,7 +166,7 @@ export default function Catag({ maping, mapingGl, clicked }) {
   });
 
   return (
-    <div className="absolute bottom-2 right-12 box-border">
+    <div className="absolute bottom-2 right-12 box-border" id="scrollStyling">
       <div
         className={`bg-white w-full h-80 mb-2 rounded-lg overflow-auto text-center font-bold ${className}`}
       >
