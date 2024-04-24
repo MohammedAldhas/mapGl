@@ -19,7 +19,29 @@ export default function ShowMap({ onMapClick }) {
   const [cent, setcent] = useState([]);
   const [maping, setmaping] = useState(null);
   const [mapingGl, setmapingGl] = useState(null);
+  const [showMarker] = useState([]);
 
+  if (maping) {
+    // click handel map click
+    maping.on("click", (e) => {
+      const clickedLngLat = e.lngLat;
+      onMapClick(clickedLngLat);
+      setclassN("invisible");
+      setclasspopup("-left-[80%]");
+
+      if (showMarker.length > 0) {
+        showMarker.map((e) => {
+          e.destroy();
+        });
+      }
+
+      showMarker.push(
+        new mapingGl.Marker(maping, {
+          coordinates: [clickedLngLat[0], clickedLngLat[1]],
+        })
+      );
+    });
+  }
   useEffect(() => {
     load().then((mapglAPI) => {
       let map = new mapglAPI.Map("map-container", {
@@ -53,18 +75,11 @@ export default function ShowMap({ onMapClick }) {
         });
       }, 800);
 
-      new mapingGl.Marker(maping, {
-        coordinates: [cent[0], cent[1]],
-      });
-    }
-    if (maping) {
-      // click handel map click
-      maping.on("click", (e) => {
-        const clickedLngLat = e.lngLat;
-        onMapClick(clickedLngLat);
-        setclassN("invisible");
-        setclasspopup("-left-[80%]");
-      });
+      showMarker.push(
+        new mapingGl.Marker(maping, {
+          coordinates: [cent[0], cent[1]],
+        })
+      );
     }
   }, [cent, maping]);
 

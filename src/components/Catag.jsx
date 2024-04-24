@@ -1,6 +1,8 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import axios from "axios";
+import blue from "../icons/blue.svg";
+import red from "../icons/red.svg";
 
 export default function Catag({ maping, mapingGl, clicked }) {
   const [types, settypes] = useState();
@@ -13,6 +15,16 @@ export default function Catag({ maping, mapingGl, clicked }) {
   if (maping) {
     maping.on("click", () => {
       setclassName("hidden");
+      if (markerPoint.length > 0) {
+        markerPoint.forEach((mrk) => {
+          mrk.destroy();
+        });
+      }
+      if (showMAarker.length > 0) {
+        showMAarker.forEach((mrk) => {
+          mrk.destroy();
+        });
+      }
     });
   }
   const lists = [
@@ -111,7 +123,7 @@ export default function Catag({ maping, mapingGl, clicked }) {
       markerPoint.push(
         new mapingGl.Marker(maping, {
           coordinates: [w.point.lon, w.point.lat],
-          icon: "https://docs.2gis.com/img/mapgl/marker.svg",
+          icon: blue,
         })
       );
     });
@@ -128,6 +140,7 @@ export default function Catag({ maping, mapingGl, clicked }) {
       showMAarker.push(
         new mapingGl.Marker(maping, {
           coordinates: [dat.point.lon, dat.point.lat],
+          icon: red,
         })
       );
     }
