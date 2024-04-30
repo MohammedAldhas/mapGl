@@ -23,6 +23,7 @@ export default function ShowMap({ onMapClick }) {
 
   if (maping) {
     // click handel map click
+
     maping.on("click", (e) => {
       const clickedLngLat = e.lngLat;
       onMapClick(clickedLngLat);
@@ -42,6 +43,11 @@ export default function ShowMap({ onMapClick }) {
       );
     });
   }
+  const dirBtn = `<button class="box-border shadow rounded-lg px-3 py-1 bg-white hover:bg-slate-100 flex items-center">
+      <span class="material-symbols-outlined">
+      route
+      </span>
+    </button>`;
   useEffect(() => {
     load().then((mapglAPI) => {
       let map = new mapglAPI.Map("map-container", {
@@ -54,6 +60,17 @@ export default function ShowMap({ onMapClick }) {
       setmaping(map);
 
       setmapingGl(mapglAPI);
+
+      const control = new mapglAPI.Control(map, dirBtn, {
+        position: "topLeft",
+      });
+
+      control
+        .getContainer()
+        .querySelector("button")
+        .addEventListener("click", () => {
+          dirfunc(map);
+        });
     });
 
     return () => maping && maping.destroy();
@@ -127,6 +144,12 @@ export default function ShowMap({ onMapClick }) {
       setsearchInput(e.target.previousElementSibling.innerText);
     }
   }
+
+  function dirfunc(m) {
+    m.on("click", (e) => {
+      console.log(e.lngLat);
+    });
+  }
   return (
     <>
       <div className="w-full h-[100vh]">
@@ -175,7 +198,6 @@ export default function ShowMap({ onMapClick }) {
         </div>
       </div>
       <Catag maping={maping} mapingGl={mapingGl} clicked={catagClicked} />
-
       <div
         className={`box-border absolute top-[1px] transition-[${classpopup}] ease-in-out duration-700 ${classpopup} w-[550px] h-[99vh] overflow-auto bg-white z-50 box-border`}
         id="scrollStyling"
