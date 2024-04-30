@@ -6,12 +6,11 @@ import MapWrapper from "./MapWrapper";
 import { apiKey } from "../../public/info";
 import Suggest from "./Suggest";
 import axios from "axios";
+import useMyHook from "../hooks/useMyHook";
 import PlacesInfo from "./PlacesInfo";
 import Catag from "./Catag";
 
 export default function ShowMap({ onMapClick }) {
-  const [data, setData] = useState([]);
-  const [region, setRegion] = useState([]);
   const [classN, setclassN] = useState("invisible");
   const [classpopup, setclasspopup] = useState("-left-[80%]");
   const [searchInput, setsearchInput] = useState("");
@@ -20,7 +19,17 @@ export default function ShowMap({ onMapClick }) {
   const [maping, setmaping] = useState(null);
   const [mapingGl, setmapingGl] = useState(null);
   const [showMarker] = useState([]);
-
+  const [region, setRegion] = useState([]);
+  const {
+    data: data,
+    loading,
+    error,
+  } = useMyHook(
+    `https://catalog.api.2gis.com/3.0/suggests?q=${searchInput}&fields=items.point,items.region_id&location=46.711670,24.640437&key=${apiKey}&locale=en_SA`
+  );
+  if (error) {
+    console.error(error);
+  }
   if (maping) {
     // click handel map click
 
@@ -48,6 +57,8 @@ export default function ShowMap({ onMapClick }) {
       route
       </span>
     </button>`;
+
+  // show map
   useEffect(() => {
     load().then((mapglAPI) => {
       let map = new mapglAPI.Map("map-container", {
@@ -99,29 +110,22 @@ export default function ShowMap({ onMapClick }) {
       );
     }
   }, [cent, maping]);
-
+  console.log(data);
   // ==================================================
 
   useEffect(() => {
     if (searchInput == "") {
       return;
     }
+
     axios
       .get(
-        `https://catalog.api.2gis.com/3.0/suggests?q=${searchInput}&fields=items.point,items.region_id&location=46.711670,24.640437&key=${apiKey}&locale=en_SA`
+        `https://catalog.api.2gis.com/2.0/region/list?q=${searchInput}&key=${apiKey}&locale=en_SA`
       )
       .then((res) => {
-        setData(res.data.result.items);
-      })
-      .then(
-        axios
-          .get(
-            `https://catalog.api.2gis.com/2.0/region/list?q=${searchInput}&key=${apiKey}&locale=en_SA`
-          )
-          .then((res) => {
-            setRegion(res.data.result.items);
-          })
-      );
+        console.log(res);
+        setRegion(res.data.result.items);
+      });
   }, [searchInput]);
 
   function clickOnSuggestion(arr) {
@@ -170,15 +174,15 @@ export default function ShowMap({ onMapClick }) {
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
-              setPlaces(data);
+              setPlaces(data?.items);
               setclasspopup("left-0");
               setclassN("invisible");
             }
           }}
         />
         <div id="suggest" className={`${classN} text-center font-semibold`}>
-          {data.length > 0 ? (
-            data.map((res, id) => {
+          {data ? (
+            data?.items.map((res, id) => {
               return (
                 <div key={id}>
                   <Suggest
@@ -216,12 +220,13 @@ export default function ShowMap({ onMapClick }) {
         {/* all places info */}
         {places.map((el, i) => {
           //take region id from suggest API
-          let datamap = data.map((d) => {
+          let datamap = data?.items.map((d) => {
             return d.region_id;
           });
           // To compare it with region API
           let regions = region.filter((reg) => datamap.includes(reg.id));
 
+          // console.log(region);
           // This shows when you press Enter
           return (
             <PlacesInfo
