@@ -44,12 +44,6 @@ export default function ShowMap({ onMapClick }) {
           e.destroy();
         });
       }
-
-      showMarker.push(
-        new mapingGl.Marker(maping, {
-          coordinates: [clickedLngLat[0], clickedLngLat[1]],
-        })
-      );
     });
   }
   const dirBtn = `<button class="box-border shadow rounded-lg px-3 py-1 bg-white hover:bg-slate-100 flex items-center">
@@ -110,7 +104,7 @@ export default function ShowMap({ onMapClick }) {
       );
     }
   }, [cent, maping]);
-  console.log(data);
+
   // ==================================================
 
   useEffect(() => {
@@ -170,6 +164,7 @@ export default function ShowMap({ onMapClick }) {
               setsearchInput(e.target.value);
             } else {
               setclassN("invisible");
+              setsearchInput("");
             }
           }}
           onKeyDown={(e) => {
@@ -181,7 +176,9 @@ export default function ShowMap({ onMapClick }) {
           }}
         />
         <div id="suggest" className={`${classN} text-center font-semibold`}>
-          {data ? (
+          {loading ? (
+            <h3>loading...</h3>
+          ) : data ? (
             data?.items.map((res, id) => {
               return (
                 <div key={id}>

@@ -1,0 +1,11 @@
+<svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<circle cx="12.5" cy="12.5" r="12.5" fill="#0057FF"/>
+<circle cx="12.5" cy="12.5" r="10.5" fill="white"/>
+<circle cx="12.5" cy="12.5" r="7.5" fill="url(#pattern0_102_11)"/>
+<defs>
+<pattern id="pattern0_102_11" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image0_102_11" transform="scale(0.0416667)"/>
+</pattern>
+<image id="image0_102_11" width="24" height="24" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAALRJREFUSEvtlesNgzAMhD/mgR3a7sA+lH26Q8sOMA/UCFdRqjQv8ahE/sb2+S6nXMHKp1h5PpsD3IELcE1k9gK6d6/MmY/NoAfKxOHaNgCVC2B0AIdifvXbDHYFEF2bhUpr6mzQy2LwnwAfuy0ymBKZD6910RJpg89FapbjAfgkko1l+2SJbJ1Pm7LrV+Gzqtx7bfrMyAJdQDLh5vquxW51RiZIFjx+BU6IDFE1m2dy1HYhxROvrjkZ7ep2dgAAAABJRU5ErkJggg=="/>
+</defs>
+</svg>

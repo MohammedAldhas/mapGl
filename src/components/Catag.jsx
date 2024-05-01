@@ -7,6 +7,7 @@ import bc from "../icons/cafe.svg";
 import bm from "../icons/mall.svg";
 import bh from "../icons/hotel.svg";
 import bmo from "../icons/mosque.svg";
+import bho from "../icons/hospital.svg";
 
 import reds from "../icons/Station1.svg";
 import redr from "../icons/restaurant1.svg";
@@ -14,6 +15,7 @@ import redc from "../icons/cafe1.svg";
 import redm from "../icons/mall1.svg";
 import redh from "../icons/hotel1.svg";
 import redmo from "../icons/mosque1.svg";
+import rbho from "../icons/hospital1.svg";
 
 export default function Catag({ maping, mapingGl, clicked }) {
   const [polygonGeom, setPolygonGeom] = useState("");
@@ -29,31 +31,41 @@ export default function Catag({ maping, mapingGl, clicked }) {
 
   useEffect(() => {
     if (maping) {
-      const bounds = maping.getBounds();
-      if (bounds) {
-        const northEast = bounds.northEast;
-        const southWest = bounds.southWest;
+      try {
+        const bounds = maping.getBounds();
+        if (bounds) {
+          const northEast = bounds.northEast;
+          const southWest = bounds.southWest;
 
-        setPolygonGeom(
-          southWest[0] +
-            " " +
-            southWest[1] +
-            "," +
+          setPolygonGeom(
             southWest[0] +
-            " " +
-            northEast[1] +
-            "," +
-            northEast[0] +
-            " " +
-            northEast[1] +
-            "," +
-            northEast[0] +
-            " " +
-            southWest[1]
-        );
+              " " +
+              southWest[1] +
+              "," +
+              southWest[0] +
+              " " +
+              northEast[1] +
+              "," +
+              northEast[0] +
+              " " +
+              northEast[1] +
+              "," +
+              northEast[0] +
+              " " +
+              southWest[1]
+          );
+        }
+      } finally {
+        if (maping.getZoom() >= 15) {
+          comparefunc(data?.items);
+          setMessage("There is no places in currunt area");
+        } else {
+          setMessage("The Zoom is too far, Please be click here");
+          deletMarkers();
+        }
       }
     }
-  }, [types]);
+  }, [data]);
 
   function comparefunc(data) {
     if (markerPoint.length > 0) {
@@ -87,9 +99,15 @@ export default function Catag({ maping, mapingGl, clicked }) {
   }
 
   if (maping) {
-    maping.on("click", () => {
+    maping.on("click", (e) => {
       setClassName("hidden");
       deletMarkers();
+      console.log(e);
+      showMAarker.push(
+        new mapingGl.Marker(maping, {
+          coordinates: [e.lngLat[0], e.lngLat[1]],
+        })
+      );
     });
   }
 
@@ -100,6 +118,7 @@ export default function Catag({ maping, mapingGl, clicked }) {
     hotel: bh,
     station: blueSt,
     mosque: bmo,
+    hospital: bho,
   };
 
   const redIcons = {
@@ -109,6 +128,7 @@ export default function Catag({ maping, mapingGl, clicked }) {
     hotel: redh,
     station: reds,
     mosque: redmo,
+    hospital: rbho,
   };
 
   const lists = [
@@ -118,6 +138,7 @@ export default function Catag({ maping, mapingGl, clicked }) {
     { id: 4, text: "hotels", icon: "hotel" },
     { id: 5, text: "stations", icon: "local_gas_station" },
     { id: 6, text: "mosques", icon: "mosque" },
+    { id: 7, text: "hospitals", icon: "local_hospital" },
   ];
 
   const listsElement = lists.map((list) => (
@@ -125,19 +146,17 @@ export default function Catag({ maping, mapingGl, clicked }) {
       key={list.id}
       className="cursor-pointer shadow px-3 h-8 rounded-full flex justify-center items-center gap-1 bg-white align-middle hover:bg-slate-100"
       onClick={(e) => {
+        if (showMAarker.length > 0) {
+          showMAarker.forEach((mrk) => {
+            mrk.destroy();
+          });
+        }
         if (e.target.nodeName == "P") {
           setTypes(e.target.innerText.slice(0, -1));
         } else {
           setTypes(e.target.previousElementSibling.innerText.slice(0, -1));
         }
 
-        if (maping && maping.getZoom() >= 15) {
-          comparefunc(data?.items);
-          setMessage("There is no places in currunt area");
-        } else {
-          setMessage("The Zoom is too far, Please be click here");
-          deletMarkers();
-        }
         clicked(e);
         setClassName("block");
       }}
