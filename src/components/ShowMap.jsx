@@ -9,6 +9,7 @@ import axios from "axios";
 import useMyHook from "../hooks/useMyHook";
 import PlacesInfo from "./PlacesInfo";
 import Catag from "./Catag";
+import ssm from "../../../../../../Downloads/image (3).svg";
 
 export default function ShowMap({ onMapClick }) {
   const [classN, setclassN] = useState("invisible");
@@ -100,6 +101,7 @@ export default function ShowMap({ onMapClick }) {
       showMarker.push(
         new mapingGl.Marker(maping, {
           coordinates: [cent[0], cent[1]],
+          icon: `${ssm}`,
         })
       );
     }

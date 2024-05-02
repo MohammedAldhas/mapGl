@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@2gis/mapgl": "^1.45.2",
+    "2gis-maps": "^3.7.4",
     "axios": "^0.24.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"

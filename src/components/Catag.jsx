@@ -28,7 +28,19 @@ export default function Catag({ maping, mapingGl, clicked }) {
   const { data, loading, error } = useMyHook(
     `https://catalog.api.2gis.com/3.0/items?q=${types}&polygon=POLYGON((${polygonGeom}))&fields=items.point&key=demo&locale=en_SA`
   );
-
+  const goToLoc = (center) => {
+    maping.setCenter(center),
+      {
+        animate: true,
+        duration: 500,
+        easing: "linear",
+      };
+    maping.setZoom(19, {
+      animate: true,
+      duration: 800,
+      easing: "linear",
+    });
+  };
   useEffect(() => {
     if (maping) {
       try {
@@ -76,12 +88,29 @@ export default function Catag({ maping, mapingGl, clicked }) {
 
     let m = icons[`${types}`];
     data?.map((w) => {
-      markerPoint.push(
-        new mapingGl.Marker(maping, {
-          coordinates: [w.point.lon, w.point.lat],
-          icon: m,
-        })
-      );
+      let i = new mapingGl.Marker(maping, {
+        coordinates: [w.point.lon, w.point.lat],
+        icon: m,
+      });
+      markerPoint.push(i);
+      i.on("click", () => {
+        goToLoc([w.point.lon, w.point.lat]);
+      });
+      i.on("mouseover", () => {
+        showMAarker.push(
+          new mapingGl.Marker(maping, {
+            coordinates: [w.point.lon, w.point.lat],
+            icon: redIcons[`${types}`],
+          })
+        );
+      });
+      i.on("mouseout", () => {
+        if (showMAarker.length > 0) {
+          showMAarker.forEach((mrk) => {
+            mrk.destroy();
+          });
+        }
+      });
     });
   }
 
@@ -185,6 +214,7 @@ export default function Catag({ maping, mapingGl, clicked }) {
         })
       );
     }
+
     return (
       <p
         className="text-center rounded-md hover:bg-slate-400 hover:cursor-pointer"
@@ -201,16 +231,7 @@ export default function Catag({ maping, mapingGl, clicked }) {
           }
           // showOnMap();
 
-          maping.setCenter([dat.point.lon, dat.point.lat], {
-            animate: true,
-            duration: 500,
-            easing: "linear",
-          });
-          maping.setZoom(19, {
-            animate: true,
-            duration: 800,
-            easing: "linear",
-          });
+          goToLoc([dat.point.lon, dat.point.lat]);
         }}
       >
         {dat.name}
