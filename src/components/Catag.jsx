@@ -132,7 +132,7 @@ export default function Catag({ map, mapglAPI, clicked }) {
     map.on("click", (e) => {
       setClassName("hidden");
       deletMarkers();
-      console.log(e);
+      // console.log(e);
       showMAarker.push(
         new mapglAPI.Marker(map, {
           coordinates: [e.lngLat[0], e.lngLat[1]],
