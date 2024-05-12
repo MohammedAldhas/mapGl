@@ -9,8 +9,7 @@ import axios from "axios";
 import useMyHook from "../hooks/useMyHook";
 import PlacesInfo from "./PlacesInfo";
 import Catag from "./Catag";
-import ssm from "../icons/image (3).svg";
-
+import myloc from "../icons/blue.svg";
 export default function ShowMap({ onMapClick }) {
   const [classN, setclassN] = useState("invisible");
   const [classpopup, setclasspopup] = useState("-left-[80%]");
@@ -21,6 +20,11 @@ export default function ShowMap({ onMapClick }) {
   const [mapingGl, setmapingGl] = useState(null);
   const [showMarker] = useState([]);
   const [region, setRegion] = useState([]);
+
+  const [myLoc, setmyLoc] = useState({
+    points: [],
+    marker: "",
+  });
   const {
     data: data,
     loading,
@@ -48,21 +52,50 @@ export default function ShowMap({ onMapClick }) {
     });
   }
   const dirBtn = `<button class="box-border shadow rounded-lg px-3 py-1 bg-white hover:bg-slate-100 flex items-center">
-      <span class="material-symbols-outlined">
-      route
-      </span>
+  <span class="material-symbols-outlined">
+  my_location
+  </span>
     </button>`;
-
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(() => {
+        setmyLoc({
+          ...myLoc,
+          marker: new mapingGl.Marker(maping, {
+            coordinates: myLoc.points,
+            icon: myloc,
+          }),
+        });
+        // console.log(myLoc.points);
+      });
+    }
+  }, [myLoc]);
   // show map
   useEffect(() => {
-    load().then((mapglAPI) => {
-      let map = new mapglAPI.Map("map-container", {
+    load().then(async (mapglAPI) => {
+      let map = await new mapglAPI.Map("map-container", {
         center: [46.714382, 24.644584],
         zoom: 12,
         key: apiKey,
         zoomControl: "bottomRight",
         floorControl: "bottomLeft",
       });
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+          let latitude = position.coords.latitude;
+          let longitude = position.coords.longitude;
+
+          setmyLoc({
+            ...myLoc,
+            points: [],
+          });
+          setmyLoc({
+            ...myLoc,
+            points: [longitude, latitude],
+          });
+        });
+      } else console.log("no access");
+
       setmaping(map);
 
       setmapingGl(mapglAPI);
@@ -74,8 +107,25 @@ export default function ShowMap({ onMapClick }) {
       control
         .getContainer()
         .querySelector("button")
-        .addEventListener("click", () => {
-          dirfunc(map);
+        .addEventListener("click", (e) => {
+          if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+              let latitude = position.coords.latitude;
+              let longitude = position.coords.longitude;
+              console.log(position);
+              console.log(e);
+              map.setCenter([longitude, latitude], {
+                animate: true,
+                duration: 400,
+                easing: "linear",
+              });
+              map.setZoom(17, {
+                animate: true,
+                duration: 400,
+                easing: "linear",
+              });
+            });
+          }
         });
     });
 
@@ -101,7 +151,6 @@ export default function ShowMap({ onMapClick }) {
       showMarker.push(
         new mapingGl.Marker(maping, {
           coordinates: [cent[0], cent[1]],
-          icon: `${ssm}`,
         })
       );
     }
@@ -119,8 +168,8 @@ export default function ShowMap({ onMapClick }) {
         `https://catalog.api.2gis.com/2.0/region/list?q=${searchInput}&key=${apiKey}&locale=en_SA`
       )
       .then((res) => {
-        console.log(res);
-        setRegion(res.data.result.items);
+        // console.log(res);
+        setRegion(res.data.result?.items);
       });
   }, [searchInput]);
 
@@ -145,11 +194,11 @@ export default function ShowMap({ onMapClick }) {
     }
   }
 
-  function dirfunc(m) {
-    m.on("click", (e) => {
-      console.log(e.lngLat);
-    });
-  }
+  // function dirfunc(m) {
+  //   m.on("click", (e) => {
+  //     console.log("Fefjiewj");
+  //   });
+  // }
   return (
     <>
       <div className="w-full h-[100vh]">
@@ -223,7 +272,7 @@ export default function ShowMap({ onMapClick }) {
             return d.region_id;
           });
           // To compare it with region API
-          let regions = region.filter((reg) => datamap.includes(reg.id));
+          let regions = region?.filter((reg) => datamap.includes(reg.id));
 
           // console.log(region);
           // This shows when you press Enter
@@ -237,7 +286,7 @@ export default function ShowMap({ onMapClick }) {
               address_name={el.address_name}
               type={el.type}
               region={
-                regions.length > 0 ? regions.map((re) => re.name) : "Unknown"
+                regions?.length > 0 ? regions.map((re) => re.name) : "Unknown"
               }
             />
           );

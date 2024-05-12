@@ -11,7 +11,7 @@ export default function useMyHook(url) {
     axios
       .get(url)
       .then((res) => {
-        setData(res.data.result);
+        setData(res.data?.result);
       })
       .catch((err) => {
         setError(err);

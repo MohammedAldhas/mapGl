@@ -131,7 +131,7 @@ export default function Catag({ maping, mapingGl, clicked }) {
     maping.on("click", (e) => {
       setClassName("hidden");
       deletMarkers();
-      console.log(e);
+      // console.log(e);
       showMAarker.push(
         new mapingGl.Marker(maping, {
           coordinates: [e.lngLat[0], e.lngLat[1]],
