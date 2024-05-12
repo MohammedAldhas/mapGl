@@ -16,8 +16,9 @@ import redm from "../icons/mall1.svg";
 import redh from "../icons/hotel1.svg";
 import redmo from "../icons/mosque1.svg";
 import rbho from "../icons/hospital1.svg";
+import {BASE_URL} from "../constants/Constants.js";
 
-export default function Catag({ maping, mapingGl, clicked }) {
+export default function Catag({ map, mapglAPI, clicked }) {
   const [polygonGeom, setPolygonGeom] = useState("");
   const [types, setTypes] = useState("");
   const [markerPoint] = useState([]);
@@ -26,25 +27,25 @@ export default function Catag({ maping, mapingGl, clicked }) {
   const [className, setClassName] = useState("hidden");
   // const [storeData, setstoreData] = useState([]);
   const { data, loading, error } = useMyHook(
-    `https://catalog.api.2gis.com/3.0/items?q=${types}&polygon=POLYGON((${polygonGeom}))&fields=items.point&key=demo&locale=en_SA`
+      BASE_URL + `/items?q=${types}&polygon=POLYGON((${polygonGeom}))&fields=items.point&key=demo&locale=en_SA`
   );
   const goToLoc = (center) => {
-    maping.setCenter(center),
+    map.setCenter(center),
       {
         animate: true,
         duration: 500,
         easing: "linear",
       };
-    maping.setZoom(19, {
+    map.setZoom(19, {
       animate: true,
       duration: 800,
       easing: "linear",
     });
   };
   useEffect(() => {
-    if (maping) {
+    if (map) {
       try {
-        const bounds = maping.getBounds();
+        const bounds = map.getBounds();
         if (bounds) {
           const northEast = bounds.northEast;
           const southWest = bounds.southWest;
@@ -68,7 +69,7 @@ export default function Catag({ maping, mapingGl, clicked }) {
           );
         }
       } finally {
-        if (maping.getZoom() >= 15) {
+        if (map.getZoom() >= 15) {
           comparefunc(data?.items);
           setMessage("There is no places in currunt area");
         } else {
@@ -88,7 +89,7 @@ export default function Catag({ maping, mapingGl, clicked }) {
 
     let m = icons[`${types}`];
     data?.map((w) => {
-      let i = new mapingGl.Marker(maping, {
+      let i = new mapglAPI.Marker(map, {
         coordinates: [w.point.lon, w.point.lat],
         icon: m,
       });
@@ -98,7 +99,7 @@ export default function Catag({ maping, mapingGl, clicked }) {
       });
       i.on("mouseover", () => {
         showMAarker.push(
-          new mapingGl.Marker(maping, {
+          new mapglAPI.Marker(map, {
             coordinates: [w.point.lon, w.point.lat],
             icon: redIcons[`${types}`],
           })
@@ -127,13 +128,13 @@ export default function Catag({ maping, mapingGl, clicked }) {
     }
   }
 
-  if (maping) {
-    maping.on("click", (e) => {
+  if (map) {
+    map.on("click", (e) => {
       setClassName("hidden");
       deletMarkers();
       console.log(e);
       showMAarker.push(
-        new mapingGl.Marker(maping, {
+        new mapglAPI.Marker(map, {
           coordinates: [e.lngLat[0], e.lngLat[1]],
         })
       );
@@ -208,7 +209,7 @@ export default function Catag({ maping, mapingGl, clicked }) {
         });
       }
       showMAarker.push(
-        new mapingGl.Marker(maping, {
+        new mapglAPI.Marker(map, {
           coordinates: [dat.point.lon, dat.point.lat],
           icon: redIcons[`${types}`],
         })
@@ -247,10 +248,10 @@ export default function Catag({ maping, mapingGl, clicked }) {
       >
         {loading ? (
           <h1>Loading...</h1>
-        ) : maping && maping.getZoom() >= 15 && data ? (
+        ) : map && map.getZoom() >= 15 && data ? (
           textDataList
         ) : (
-          <span className="cursor-pointer" onClick={() => maping.setZoom(15)}>
+          <span className="cursor-pointer" onClick={() => map.setZoom(15)}>
             {message}
           </span>
         )}

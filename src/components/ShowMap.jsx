@@ -10,6 +10,7 @@ import useMyHook from "../hooks/useMyHook";
 import PlacesInfo from "./PlacesInfo";
 import Catag from "./Catag";
 import ssm from "../icons/image (3).svg";
+import {BASE_URL} from "../constants/Constants.js";
 
 export default function ShowMap({ onMapClick }) {
   const [classN, setclassN] = useState("invisible");
@@ -17,8 +18,8 @@ export default function ShowMap({ onMapClick }) {
   const [searchInput, setsearchInput] = useState("");
   const [places, setPlaces] = useState([]);
   const [cent, setcent] = useState([]);
-  const [maping, setmaping] = useState(null);
-  const [mapingGl, setmapingGl] = useState(null);
+  const [map, setMap] = useState(null);
+  const [mapglAPI, setMapglAPI] = useState(null);
   const [showMarker] = useState([]);
   const [region, setRegion] = useState([]);
   const {
@@ -26,15 +27,15 @@ export default function ShowMap({ onMapClick }) {
     loading,
     error,
   } = useMyHook(
-    `https://catalog.api.2gis.com/3.0/suggests?q=${searchInput}&fields=items.point,items.region_id&location=46.711670,24.640437&key=${apiKey}&locale=en_SA`
+      BASE_URL + `/suggests?q=${searchInput}&fields=items.point,items.region_id&location=46.711670,24.640437&key=${apiKey}&locale=en_SA`
   );
   if (error) {
     console.error(error);
   }
-  if (maping) {
+  if (map) {
     // click handel map click
 
-    maping.on("click", (e) => {
+    map.on("click", (e) => {
       const clickedLngLat = e.lngLat;
       onMapClick(clickedLngLat);
       setclassN("invisible");
@@ -63,9 +64,9 @@ export default function ShowMap({ onMapClick }) {
         zoomControl: "bottomRight",
         floorControl: "bottomLeft",
       });
-      setmaping(map);
+      setMap(map);
 
-      setmapingGl(mapglAPI);
+      setMapglAPI(mapglAPI);
 
       const control = new mapglAPI.Control(map, dirBtn, {
         position: "topLeft",
@@ -79,19 +80,19 @@ export default function ShowMap({ onMapClick }) {
         });
     });
 
-    return () => maping && maping.destroy();
+    return () => map && map.destroy();
   }, []);
 
   useEffect(() => {
-    if (cent.length > 0 && maping) {
-      maping.setCenter(cent, {
+    if (cent.length > 0 && map) {
+      map.setCenter(cent, {
         animate: true,
         duration: 900,
         easing: "linear",
       });
 
       setTimeout(() => {
-        maping.setZoom(17, {
+        map.setZoom(17, {
           animate: true,
           duration: 5000,
           easing: "linear",
@@ -99,13 +100,13 @@ export default function ShowMap({ onMapClick }) {
       }, 800);
 
       showMarker.push(
-        new mapingGl.Marker(maping, {
+        new mapglAPI.Marker(map, {
           coordinates: [cent[0], cent[1]],
           icon: `${ssm}`,
         })
       );
     }
-  }, [cent, maping]);
+  }, [cent, map]);
 
   // ==================================================
 
@@ -153,58 +154,25 @@ export default function ShowMap({ onMapClick }) {
   return (
     <>
       <div className="w-full h-[100vh]">
-        <MapWrapper />
-        <input
-          value={searchInput}
-          type="text"
-          placeholder="search here..."
-          id="search"
-          className="box-border m-1 p-2 border border-solid border-[#a68cfa75]"
-          onChange={(e) => {
-            if (e.target.value != "") {
-              setclassN("visible");
-              setsearchInput(e.target.value);
-            } else {
-              setclassN("invisible");
-              setsearchInput("");
-            }
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              setPlaces(data?.items);
-              setclasspopup("left-0");
-              setclassN("invisible");
-            }
-          }}
+        <MapWrapper/>
+
+        <Suggest
+            searchInput={searchInput}
+            setclassN={setclassN}
+            setsearchInput={setsearchInput}
+            setPlaces={setPlaces}
+            setclasspopup={setclasspopup}
+            classN={classN}
+            data={data}
+            loading={loading}
+            clickOnSuggestion={clickOnSuggestion}
         />
-        <div id="suggest" className={`${classN} text-center font-semibold`}>
-          {loading ? (
-            <h3>loading...</h3>
-          ) : data ? (
-            data?.items.map((res, id) => {
-              return (
-                <div key={id}>
-                  <Suggest
-                    id={res.id}
-                    address_name={res.address_name}
-                    name={res.name}
-                    handle={() => {
-                      clickOnSuggestion([res.point.lon, res.point.lat]);
-                    }}
-                  />
-                </div>
-              );
-            })
-          ) : (
-            <p>No suggestions available.</p>
-          )}
-        </div>
+
       </div>
-      <Catag maping={maping} mapingGl={mapingGl} clicked={catagClicked} />
-      <div
-        className={`box-border absolute top-[1px] transition-[${classpopup}] ease-in-out duration-700 ${classpopup} w-[550px] h-[99vh] overflow-auto bg-white z-50 box-border`}
-        id="scrollStyling"
-      >
+
+      <Catag map={map} mapglAPI={mapglAPI} clicked={catagClicked} />
+
+      <div className={`box-border absolute top-[1px] transition-[${classpopup}] ease-in-out duration-700 ${classpopup} w-[550px] h-[99vh] overflow-auto bg-white z-50 box-border`} id="scrollStyling">
         <div className="w-full flex justify-end items-center sticky top-1 right-1">
           <div
             className="bg-red-400 w-[25px] h-[25px] rounded-full  cursor-pointer flex justify-center items-center text-zinc-200 hover:scale-105 hover:bg-red-700"

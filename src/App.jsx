@@ -3,12 +3,13 @@ import { apiKey } from "../public/info";
 
 import ShowMap from "./components/ShowMap";
 import useMyHook from "./hooks/useMyHook";
+import {BASE_URL} from "./constants/Constants.js";
 
 export default function App() {
   const [lngLat, setLngLat] = useState([]);
   const [classN, setclassN] = useState("hidden");
   const { data, loading, error } = useMyHook(
-    `https://catalog.api.2gis.com/3.0/items/geocode?lon=${lngLat[0]}&lat=${lngLat[1]}&fields=items.point&key=${apiKey}`
+      BASE_URL + `/items/geocode?lon=${lngLat[0]}&lat=${lngLat[1]}&fields=items.point&key=${apiKey}`
   );
 
   const handleMapClick = (clickedLngLat) => {
