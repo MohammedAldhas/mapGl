@@ -13,14 +13,14 @@ import Catag from "./Catag";
 import {BASE_URL} from "../constants/Constants.js";
 
 import myloc from "../icons/blue.svg";
-export default function ShowMap({ onMapClick }) {
+export default function ShowMap({ onMapClick, map, mapglAPI }) {
   const [classN, setclassN] = useState("invisible");
   const [classpopup, setclasspopup] = useState("-left-[80%]");
   const [searchInput, setsearchInput] = useState("");
   const [places, setPlaces] = useState([]);
   const [cent, setcent] = useState([]);
-  const [map, setMap] = useState(null);
-  const [mapglAPI, setMapglAPI] = useState(null);
+  // const [map, setMap] = useState(null);
+  // const [mapglAPI, setMapglAPI] = useState(null);
   const [showMarker] = useState([]);
   const [region, setRegion] = useState([]);
 
@@ -59,82 +59,87 @@ export default function ShowMap({ onMapClick }) {
   my_location
   </span>
     </button>`;
-  useEffect(() => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(() => {
-        setmyLoc({
-          ...myLoc,
-          marker: new mapglAPI.Marker(map, {
-            coordinates: myLoc.points,
-            icon: myloc,
-          }),
-        });
-        // console.log(myLoc.points);
-      });
-    }
-  }, [myLoc]);
+
+
+  // useEffect(() => {
+  //   if ("geolocation" in navigator) {
+  //     navigator.geolocation.getCurrentPosition(() => {
+  //       setmyLoc({
+  //         ...myLoc,
+  //         marker: new mapglAPI.Marker(map, {
+  //           coordinates: myLoc.points,
+  //           icon: myloc,
+  //         }),
+  //       });
+  //       // console.log(myLoc.points);
+  //     });
+  //   }
+  // }, [myLoc]);
   // show map
-  useEffect(() => {
-    load().then(async (mapglAPI) => {
-      let map = await new mapglAPI.Map("map-container", {
-        center: [46.714382, 24.644584],
-        zoom: 12,
-        key: apiKey,
-        zoomControl: "bottomRight",
-        floorControl: "bottomLeft",
-      });
-
-      if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(function (position) {
-          let latitude = position.coords.latitude;
-          let longitude = position.coords.longitude;
-
-          setmyLoc({
-            ...myLoc,
-            points: [],
-          });
-          setmyLoc({
-            ...myLoc,
-            points: [longitude, latitude],
-          });
-        });
-      } else console.log("no access");
-
-      setMap(map);
-
-      setMapglAPI(mapglAPI);
-
-      const control = new mapglAPI.Control(map, dirBtn, {
-        position: "topLeft",
-      });
-
-      control
-        .getContainer()
-        .querySelector("button")
-        .addEventListener("click", (e) => {
-          if ("geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(function (position) {
-              let latitude = position.coords.latitude;
-              let longitude = position.coords.longitude;
-              console.log(position);
-              console.log(e);
-              map.setCenter([longitude, latitude], {
-                animate: true,
-                duration: 400,
-                easing: "linear",
-              });
-              map.setZoom(17, {
-                animate: true,
-                duration: 400,
-                easing: "linear",
-              });
-            });
-          }
-        });
-    });
-
-    return () => map && map.destroy();
-  }, []);
+  // useEffect(() => {
+  //   load().then(async (mapglAPI) => {
+  //     let map = await new mapglAPI.Map("map-container", {
+  //       center: [46.6738685, 24.7105117],
+  //       zoom: 17,
+  //       key: apiKey,
+  //       zoomControl: "bottomRight",
+  //       floorControl: "topCenter",
+  //       pitch: '45'
+  //     });
+  //
+  //     // if ("geolocation" in navigator) {
+  //     //   navigator.geolocation.getCurrentPosition(function (position) {
+  //     //     let latitude = position.coords.latitude;
+  //     //     let longitude = position.coords.longitude;
+  //     //
+  //     //     setmyLoc({
+  //     //       ...myLoc,
+  //     //       points: [],
+  //     //     });
+  //     //     setmyLoc({
+  //     //       ...myLoc,
+  //     //       points: [longitude, latitude],
+  //     //     });
+  //     //   });
+  //     // } else console.log("no access");
+  //
+  //     setMap(map);
+  //     setMapglAPI(mapglAPI);
+  //
+  //     window.localStorage["map"] = map;
+  //     window.localStorage["mapglAPI"] = mapglAPI;
+  //
+  //     // const control = new mapglAPI.Control(map, dirBtn, {
+  //     //   position: "bottomLeft",
+  //     // });
+  //
+  //     // control
+  //     //   .getContainer()
+  //     //   .querySelector("button")
+  //     //   .addEventListener("click", (e) => {
+  //     //     if ("geolocation" in navigator) {
+  //     //       navigator.geolocation.getCurrentPosition(function (position) {
+  //     //         let latitude = position.coords.latitude;
+  //     //         let longitude = position.coords.longitude;
+  //     //         console.log(position);
+  //     //         console.log(e);
+  //     //         map.setCenter([longitude, latitude], {
+  //     //           animate: true,
+  //     //           duration: 400,
+  //     //           easing: "linear",
+  //     //         });
+  //     //         map.setZoom(17, {
+  //     //           animate: true,
+  //     //           duration: 400,
+  //     //           easing: "linear",
+  //     //         });
+  //     //       });
+  //     //     }
+  //     //   });
+  //   });
+  //
+  //   return () => map && map.destroy();
+  // }, []);
 
   useEffect(() => {
     if (cent.length > 0 && map) {
@@ -222,47 +227,48 @@ export default function ShowMap({ onMapClick }) {
 
       </div>
 
-      <Catag map={map} mapglAPI={mapglAPI} clicked={catagClicked} />
+      {/*<Catag map={map} mapglAPI={mapglAPI} clicked={catagClicked} />*/}
 
-      <div className={`box-border absolute top-[1px] transition-[${classpopup}] ease-in-out duration-700 ${classpopup} w-[550px] h-[99vh] overflow-auto bg-white z-50 box-border`} id="scrollStyling">
-        <div className="w-full flex justify-end items-center sticky top-1 right-1">
-          <div
-            className="bg-red-400 w-[25px] h-[25px] rounded-full  cursor-pointer flex justify-center items-center text-zinc-200 hover:scale-105 hover:bg-red-700"
-            onClick={() => {
-              setclasspopup("-left-[80%]");
-            }}
-          >
-            <p>X</p>
-          </div>
-        </div>
+      {/*<div className={`box-border absolute top-[1px] transition-[${classpopup}] ease-in-out duration-700 ${classpopup} w-[550px] h-[99vh] overflow-auto bg-white z-50 box-border`} id="scrollStyling">*/}
+      {/*  <div className="w-full flex justify-end items-center sticky top-1 right-1">*/}
+      {/*    <div*/}
+      {/*      className="bg-red-400 w-[25px] h-[25px] rounded-full  cursor-pointer flex justify-center items-center text-zinc-200 hover:scale-105 hover:bg-red-700"*/}
+      {/*      onClick={() => {*/}
+      {/*        setclasspopup("-left-[80%]");*/}
+      {/*      }}*/}
+      {/*    >*/}
+      {/*      <p>X</p>*/}
+      {/*    </div>*/}
+      {/*  </div>*/}
 
-        {/* all places info */}
-        {places.map((el, i) => {
-          //take region id from suggest API
-          let datamap = data?.items.map((d) => {
-            return d.region_id;
-          });
-          // To compare it with region API
-          let regions = region?.filter((reg) => datamap.includes(reg.id));
+      {/*  /!* all places info *!/*/}
+      {/*  {places.map((el, i) => {*/}
+      {/*    //take region id from suggest API*/}
+      {/*    let datamap = data?.items.map((d) => {*/}
+      {/*      return d.region_id;*/}
+      {/*    });*/}
+      {/*    // To compare it with region API*/}
+      {/*    let regions = region?.filter((reg) => datamap.includes(reg.id));*/}
 
-          // console.log(region);
-          // This shows when you press Enter
-          return (
-            <PlacesInfo
-              handel={() => {
-                goToLoc(el.point);
-              }}
-              key={i}
-              name={el.name}
-              address_name={el.address_name}
-              type={el.type}
-              region={
-                regions?.length > 0 ? regions.map((re) => re.name) : "Unknown"
-              }
-            />
-          );
-        })}
-      </div>
+      {/*    // console.log(region);*/}
+      {/*    // This shows when you press Enter*/}
+      {/*    return (*/}
+      {/*      <PlacesInfo*/}
+      {/*        handel={() => {*/}
+      {/*          goToLoc(el.point);*/}
+      {/*        }}*/}
+      {/*        key={i}*/}
+      {/*        name={el.name}*/}
+      {/*        address_name={el.address_name}*/}
+      {/*        type={el.type}*/}
+      {/*        region={*/}
+      {/*          regions?.length > 0 ? regions.map((re) => re.name) : "Unknown"*/}
+      {/*        }*/}
+      {/*      />*/}
+      {/*    );*/}
+      {/*  })}*/}
+      {/*</div>*/}
+
     </>
   );
 }

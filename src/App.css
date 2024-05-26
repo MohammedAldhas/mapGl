@@ -8,14 +8,15 @@
 
 #search {
   position: absolute;
-  top: 0;
+  top: 6px;
   left: 50%;
   transform: translateX(-50%);
   width: 400px;
-  height: 25px;
-  padding: 5px 10px;
-  border-radius: 12px;
-  border: none;
+  /*height: 25px;*/
+  /*padding: 5px 10px;*/
+  /*border-radius: 12px;*/
+  border: 0px solid black;
+  background: white;
 }
 #search:focus {
   border: 1px rgba(0, 0, 0, 0.248) solid;
@@ -25,7 +26,7 @@
 #suggest {
   position: absolute;
   background-color: #fff;
-  top: 30px;
+  top: 60px;
   left: 50%;
   transform: translateX(-49%);
   width: 400px;

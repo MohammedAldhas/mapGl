@@ -4,13 +4,13 @@ import { apiKey } from "../public/info";
 import ShowMap from "./components/ShowMap";
 import useMyHook from "./hooks/useMyHook";
 import {BASE_URL} from "./constants/Constants.js";
+import Identify from "./components/Identify.jsx";
+import {load} from "@2gis/mapgl";
 
-export default function App() {
+export default function App({map, mapglAPI}) {
   const [lngLat, setLngLat] = useState([]);
   const [classN, setclassN] = useState("hidden");
-  const { data, loading, error } = useMyHook(
-      BASE_URL + `/items/geocode?lon=${lngLat[0]}&lat=${lngLat[1]}&fields=items.point&key=${apiKey}`
-  );
+  const { data, loading, error } = useMyHook(BASE_URL + `/items/geocode?lon=${lngLat[0]}&lat=${lngLat[1]}&fields=items.point&key=${apiKey}`);
 
   const handleMapClick = (clickedLngLat) => {
     setLngLat(clickedLngLat);
@@ -26,30 +26,14 @@ export default function App() {
     return console.log(error);
   }
 
+
   return (
     <>
-      <ShowMap onMapClick={handleMapClick} />
 
-      <div
-        className={`${classN} box-border p-3 shadow m-2 border-2 border-solid border-[#00000037] rounded-xl w-[280px] text-sm absolute top-0 right-0 bg-[#f5deb3c4]`}
-      >
-        {loading ? (
-          <h1>Loading...</h1>
-        ) : (
-          <>
-            <p>
-              Address: {data?.items[0].address_name || data?.items[0].full_name}
-            </p>
-            <p>Name: {data?.items[0].name || data?.items[0].full_name}</p>
-            <p>Building: {data?.items[0].building_name || "Unknown"}</p>
-            <p>
-              lang: {data?.items[0]?.point ? data?.items[0]?.point.lat : ""}{" "}
-              lon: {data?.items[0]?.point ? data?.items[0]?.point.lon : ""}
-            </p>
-            <p>type:{data?.items[0]?.type}</p>
-          </>
-        )}
-      </div>
+      <ShowMap onMapClick={handleMapClick} map={map} mapglAPI={mapglAPI} />
+
+      <Identify loading={loading} classN={classN} data={data} setclassN={setclassN} />
+
     </>
   );
 }

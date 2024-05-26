@@ -1,13 +1,16 @@
 /* eslint-disable react/prop-types */
+import { Input } from '@chakra-ui/react'
+
 export default function Suggest({data, clickOnSuggestion, searchInput, setclassN, setsearchInput, setPlaces, setclasspopup, classN, loading}) {
   return (
     <>
-        <input
+        <Input
             value={searchInput}
             type="text"
-            placeholder="search here..."
+            placeholder="Search..."
             id="search"
-            className="box-border m-1 p-2 border border-solid border-[#a68cfa75]"
+            sx={{ zIndex: '99999', border: '10px solid red', borderColor: '#fff' }}
+            // className="box-border m-1 p-2 border border-solid border-[#a68cfa75]"
             onChange={(e) => {
                 if (e.target.value != "") {
                     setclassN("visible");

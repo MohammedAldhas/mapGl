@@ -17,6 +17,8 @@ import redh from "../icons/hotel1.svg";
 import redmo from "../icons/mosque1.svg";
 import rbho from "../icons/hospital1.svg";
 import {BASE_URL} from "../constants/Constants.js";
+import { Badge } from '@chakra-ui/react'
+import { Kbd } from '@chakra-ui/react'
 
 export default function Catag({ map, mapglAPI, clicked }) {
   const [polygonGeom, setPolygonGeom] = useState("");
@@ -172,7 +174,7 @@ export default function Catag({ map, mapglAPI, clicked }) {
   ];
 
   const listsElement = lists.map((list) => (
-    <li
+    <Kbd
       key={list.id}
       className="cursor-pointer shadow px-3 h-8 rounded-full flex justify-center items-center gap-1 bg-white align-middle hover:bg-slate-100"
       onClick={(e) => {
@@ -193,7 +195,7 @@ export default function Catag({ map, mapglAPI, clicked }) {
     >
       <p>{list.text}</p>
       <span className="material-symbols-outlined">{list.icon}</span>
-    </li>
+    </Kbd>
   ));
 
   if (error) {
